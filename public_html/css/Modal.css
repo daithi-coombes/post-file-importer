@@ -1,0 +1,12 @@
+#modal-container{
+	margin: 8px;
+}
+#method-list{
+	float: left;
+	border: 1px solid;
+	width: 180px;
+}
+#method-pane{
+	border: 1px solid;
+	margin-left: 200px;
+}
