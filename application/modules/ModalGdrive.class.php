@@ -57,6 +57,10 @@ class ModalGdrive extends Controller{
 		));
 	}
 	
+	private function get_token(){
+		ar_print($_REQUEST);
+	}
+	
 	/**
 	 * Callback to handle the authorization code.
 	 * 
@@ -73,22 +77,22 @@ class ModalGdrive extends Controller{
 		wp_enqueue_style('colors');
 		wp_head();
 		?>
-				<script type="text/javascript">
-					function getUrlVars() {
-						var vars = {};
-						var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-							vars[key] = value;
-						});
-						return vars;
-					}
-					jQuery(document).ready(function($){
-						var code = getUrlVars()['code'];
-						var url = window.opener.document.URL
-							+ '&saction=get_token&code='+code;
-						console.log(url);
-						window.opener.location.href = url;
+			<script type="text/javascript">
+				function getUrlVars() {
+					var vars = {};
+					var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+						vars[key] = value;
 					});
-				</script>
+					return vars;
+				}
+				jQuery(document).ready(function($){
+					var code = getUrlVars()['code'];
+					var url = window.opener.document.URL
+						+ '&saction=get_token&code='+code;
+					console.log(url);
+					window.opener.location.href = url;
+				});
+			</script>
 		</head><?php
 		
 		//html body
