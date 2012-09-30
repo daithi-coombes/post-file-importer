@@ -75,7 +75,7 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_PORT, true);
+		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = curl_exec($ch);
 		ar_print($res);
