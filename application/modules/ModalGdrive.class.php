@@ -35,7 +35,7 @@ class ModalGdrive extends Controller{
 		parent::__construct(__CLASS__);
 		
 		//look for actions
-		$action = $_REQUEST['saction'];
+		$action = @$_REQUEST['saction'];
 		if(method_exists($this, $action))
 			$this->$action();
 	}
