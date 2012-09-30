@@ -63,17 +63,20 @@ class ModalGdrive extends Controller{
 	 */
 	private function get_token(){
 		
+		$params = array(
+			'code' => $_REQUEST['code'],
+			'client_id' => $this->client_id,
+			'redirect_uri' => $this->redirect_uri,
+			'grant_type' => 'authorization_code'
+		);
+		ar_print($params);
+		
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_PORT, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-			'code' => $_REQUEST['code'],
-			'client_id' => $this->client_id,
-			'redirect_uri' => $this->redirect_uri,
-			'grant_type' => 'authorization_code'
-		));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = curl_exec($ch);
 		ar_print($res);
 	}
