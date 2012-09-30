@@ -73,7 +73,7 @@ class ModalGdrive extends Controller{
 			'client_secret' => $this->client_secret,
 			'scope' => $this->scope,
 			'redirect_uri' => $this->redirect_uri,
-			'grant_type' => 'authorization_code'
+			'grant_type' => 'refresh_token'
 		);
 		
 		$ch = curl_init();
