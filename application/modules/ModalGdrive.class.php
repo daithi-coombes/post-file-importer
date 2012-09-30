@@ -29,7 +29,7 @@ class ModalGdrive extends Controller{
 	/** @var string The refresh token to keep user signed in */
 	private $refresh_token = "";
 	/** @var string The google app scope */
-	private $scope = 'https://docs.google.com/feeds/,https://www.googleapis.com/auth/userinfo.profile';
+	private $scope = 'https://docs.google.com/feeds/ https://www.googleapis.com/auth/userinfo.profile';
 	
 	public function __construct(){
 		
@@ -128,9 +128,12 @@ class ModalGdrive extends Controller{
 		$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
+		ar_print($this->access_token);
 		//get user info
+		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/oauth2/v1/userinfo?access_token={$this->access_token}");
-		curl_setopt($ch, CURLOPT_POST, false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
 		ar_print($res);
 		
