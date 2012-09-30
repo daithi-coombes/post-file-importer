@@ -1,1 +1,2 @@
-this is the iframe of the gdrive servive
+
+<a href="<!--[--gauth url--]-->">Google GDrive login</a>
