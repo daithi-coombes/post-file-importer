@@ -29,7 +29,7 @@ class ModalGdrive extends Controller{
 	/** @var string The refresh token to keep user signed in */
 	private $refresh_token = "";
 	/** @var string The google app scope */
-	private $scope = 'https://docs.google.com/feeds/';
+	private $scope = 'https://docs.google.com/feeds/,https://www.googleapis.com/auth/userinfo.profile';
 	
 	public function __construct(){
 		
@@ -128,10 +128,20 @@ class ModalGdrive extends Controller{
 		$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
+		//get user info
+		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/oauth2/v1/userinfo?access_token={$this->access_token}");
+		curl_setopt($ch, CURLOPT_POST, false);
+		$res = json_decode(curl_exec($ch));
+		ar_print($res);
 		
-		ar_print($this);
 	}
 	
+	/**
+	 * Shortcode method. Returns the style for the logged in/out containers.
+	 * 
+	 * @param boolean $logged_in
+	 * @return string 
+	 */
 	private function get_view_class( $logged_in ){
 		if(
 			(!$logged_in && !$this->refresh_token) ||
@@ -140,8 +150,11 @@ class ModalGdrive extends Controller{
 		return "style=\"display:none\"";
 	}
 	
+	/**
+	 * 
+	 * @return string 
+	 */
 	private function list_files(){
-		
 		return "<ul><li>this</li><li>is</li><li>the</li><li>file</li><li>list</li></ul>\n";
 	}
 	
