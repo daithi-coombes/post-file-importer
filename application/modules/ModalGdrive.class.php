@@ -67,8 +67,8 @@ class ModalGdrive extends Controller{
 		$this->shortcodes = array(
 			'gauth url' => $this->get_url(),
 			'list files' => $this->list_files(),
-			'class logged in' => $this->get_view_class(),
-			'class logged out' => $this->get_view_class()
+			'class logged in' => $this->get_view_class(true),
+			'class logged out' => $this->get_view_class(false)
 		);		
 		$this->shortcodes['errors'] = $this->get_errors();
 		$this->shortcodes['messages'] = $this->get_messages();
@@ -169,6 +169,7 @@ class ModalGdrive extends Controller{
 	 */
 	private function list_files(){
 		
+		if(!$this->user) return "";
 		ar_print("listing files...");
 		
 		//vars
