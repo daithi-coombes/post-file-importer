@@ -66,6 +66,8 @@ class ModalGdrive extends Controller{
 		
 		//html head
 		?><html><head><?php
+		$this->load_styles();
+		$this->load_scripts();
 		wp_enqueue_script('jquery');
 		wp_enqueue_style('media');
 		wp_enqueue_style('colors');
@@ -79,8 +81,9 @@ class ModalGdrive extends Controller{
 		</head><?php
 		
 		//html body
-		?><body id="media-upload" class="js"><?php
-		($html) ? print $html : $this->get_page();
+		?><body id="media-upload" class="js">
+			redirecting back to david-coombes.com...
+			<?php
 		
 		//footer and die()
 		wp_footer();

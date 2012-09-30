@@ -243,7 +243,7 @@ class Controller{
 	 * 
 	 * @return void 
 	 */
-	private function load_scripts() {
+	public function load_scripts() {
 		
 		if(!file_exists("{$this->config->plugin_dir}/public_html/js/{$this->class_name}.min.js")) return;
 		wp_register_script($this->class_name, "{$this->config->plugin_url}/public_html/js/{$this->class_name}.min.js", $this->script_deps);
@@ -255,7 +255,7 @@ class Controller{
 	 * 
 	 * @return void 
 	 */
-	private function load_styles() {
+	public function load_styles() {
 		
 		if(!file_exists("{$this->config->plugin_dir}/public_html/css/{$this->class_name}.css")) return;
 		wp_register_style($this->class_name, "{$this->config->plugin_url}/public_html/css/{$this->class_name}.css", $this->style_deps);
