@@ -177,7 +177,7 @@ class ModalGdrive extends Controller{
 		$url = url_query_append("https://www.googleapis.com/drive/v2/files", array(
 			'access_token' => $this->access_token
 		));
-		$res = "<ul>\n";
+		$ret = "<ul>\n";
 		if(!$this->access_token) $this->get_token();
 		
 		//get file list
@@ -192,12 +192,10 @@ class ModalGdrive extends Controller{
 		
 		//build html and return
 		foreach($res->items as $file){
-			if(is_string($file->title)) ar_print($file->title);
-			$title = (string) $file->title;
-			print $title;
+			$ret .= "<li>{$file}</li>\n";
 		}
 			
-		return "{$res}</ul>\n";
+		return "{$ret}</ul>\n";
 	}
 	
 	/**
