@@ -185,7 +185,6 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
 		
 		//error report
 		if(@$res->error)
@@ -193,8 +192,7 @@ class ModalGdrive extends Controller{
 		
 		//build html and return
 		foreach($res->items as $file)
-			if(@$file->title) $res .= "<li>{$file->title}</li>\n";
-			else ar_print($file);
+			ar_print($file);
 			
 		return "{$res}</ul>\n";
 	}
