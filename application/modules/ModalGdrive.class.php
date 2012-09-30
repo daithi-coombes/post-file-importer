@@ -173,6 +173,7 @@ class ModalGdrive extends Controller{
 			'access_token' => $this->access_token
 		));
 		$res = "<ul>\n";
+		if(!$this->access_token) $this->get_token();
 		
 		//get file list
 		curl_setopt($ch, CURLOPT_URL, $url);
