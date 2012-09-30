@@ -192,7 +192,7 @@ class ModalGdrive extends Controller{
 		
 		//build html and return
 		foreach($res->items as $file){
-			$ret .= "<li>{$file}</li>\n";
+			$ret .= "<li>{$file->title}</li>\n";
 		}
 			
 		return "{$ret}</ul>\n";
