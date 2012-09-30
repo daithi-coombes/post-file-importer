@@ -133,7 +133,7 @@ class ModalGdrive extends Controller{
 			return print "<div class=\"error\">{$res->error}</div>\n";
 		
 		//set params
-		$this->refresh_token = $res->refresh_token;
+		if(@$res->refresh_token) $this->refresh_token = $res->refresh_token;
 		//$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
@@ -193,7 +193,9 @@ class ModalGdrive extends Controller{
 		
 		//build html and return
 		foreach($res->items as $file)
-			$res .= "<li>{$file->title}</li>\n";
+			if(@$file->title) $res .= "<li>{$file->title}</li>\n";
+			else ar_print($file);
+			
 		return "{$res}</ul>\n";
 	}
 	
