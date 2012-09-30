@@ -83,9 +83,10 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = json_decode(curl_exec($ch));
+		ar_print($res);
 		
 		//error report
-		if($res->error)
+		if(@$res->error)
 			print "<div class=\"error\">{$res->error}</div>\n";
 	}
 	
