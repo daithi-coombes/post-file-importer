@@ -1,6 +1,5 @@
 <?php
-namespace CityIndex\WP\PostExternal;
-
+namespace CityIndex\WP\PostImporter;
 /**
  * @package cityindex
  * @subpackage ci-wp-post-external
@@ -8,7 +7,7 @@ namespace CityIndex\WP\PostExternal;
 /*
 Plugin Name: Post Editor
 Plugin URI: http://david-coombes.com
-Description: Add a modal to the wordpress post/page editor that will allow the user to add content from many sources.
+Description: Adds a modal to the wordpress post/page editor that will allow the user to add content from many sources.
 Version: 0.1
 Author: David Coombes
 Author URI: http://david-coombes.com
@@ -37,7 +36,7 @@ require_once( PLUGIN_DIR . "/application/includes/debug.func.php");
  */
 $config = new Config();
 //$foo = new Controller();
-$config->action_key = "wp-plugin-action";
+$config->action_key = "ci-post-importer-action";
 $config->debug = 1;
 $config->init_modules = array(
 	'Modal'

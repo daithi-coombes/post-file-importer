@@ -20,7 +20,7 @@
 		init : function(ed, url) {
 			// Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mcePosteditormodal');
 			ed.addCommand('mcePosteditormodal', function() {
-				tb_show('', ajaxurl + '?action=get_modal_editor&posteditormodal_action=excel_to_table&_wpnonce='+posteditor_modal_nonce+'TB_iframe=true');
+				tb_show('', ajaxurl + '?action=ci_post_importer_modal&_wpnonce='+ci_post_importer_nonces.get_dialog+'TB_iframe=true');
 			});
 
 			// Register posteditormodal button

@@ -1,15 +1,11 @@
 <div id="modal-container">
 	
-	<div id="method-list">
-		<ul>
-			<li>
-				<a href="">Google Drive</a>
-			</li>
-		</ul>
+	<div id="service-list">
+		<!--[--list services--]-->
 	</div>
 	
-	<div id="method-pane">
-		This is the pane
+	<div id="sevice-container">
+		<iframe id="service-pane"></iframe>
 	</div>
 	
 	<div class="clear"></div>

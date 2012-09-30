@@ -1,6 +1,6 @@
 <?php
-namespace CityIndex\WP\PostExternal\Modules;
-use CityIndex\WP\PostExternal\Controller;
+namespace CityIndex\WP\PostImporter\Modules;
+use CityIndex\WP\PostImporter\Controller;
 
 /*
  * To change this template, choose Tools | Templates
@@ -8,7 +8,13 @@ use CityIndex\WP\PostExternal\Controller;
  */
 
 /**
- * Description of ModalGdrive
+ * Description of ModalGdrive.
+ * 
+ * This service uses Googles SSO and SAML protocol.
+ * A request is made to google servers,
+ * google checks public key and returns response
+ * client authenticates user
+ * clients sends success/false to google
  *
  * @author daithi
  */

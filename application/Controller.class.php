@@ -1,5 +1,5 @@
 <?php
-namespace CityIndex\WP\PostExternal;
+namespace CityIndex\WP\PostImporter;
 
 /**
  * Class is extended by plugin modules.
@@ -8,7 +8,7 @@ namespace CityIndex\WP\PostExternal;
  * 
  * @author daithi
  * @package cityindex
- * @subpackage ci-wp-login
+ * @subpackage ci-wp-post-importer
  */
 class Controller{
 	
@@ -146,9 +146,11 @@ class Controller{
 	 * Loads the html then sets shortcodes,loads scripts and styles then prints 
 	 * html.
 	 * 
-	 * @return void
+	 * @param boolean $return Default false. If true will return html if not
+	 * will print.
+	 * @return type 
 	 */
-	public function get_page() {
+	public function get_page( $return=false ) {
 
 		//vars
 		$this->html = file_get_contents("{$this->config->plugin_dir}/public_html/{$this->class_name}.php");
@@ -163,7 +165,8 @@ class Controller{
 		$this->load_scripts();
 		$this->load_styles();
 
-		print $this->html;
+		if(!$return) print $this->html;
+		return $this->html;
 	}
 	
 	/**

@@ -1,12 +1,12 @@
 #modal-container{
 	margin: 8px;
 }
-#method-list{
+#service-list{
 	float: left;
 	border: 1px solid;
 	width: 180px;
 }
-#method-pane{
+#service-pane{
 	border: 1px solid;
 	margin-left: 200px;
 }

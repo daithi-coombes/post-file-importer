@@ -1,6 +1,6 @@
 <?php
-namespace CityIndex\WP\PostExternal;
-use CityIndex\WP\PostExternal\Modules;
+namespace CityIndex\WP\PostImporter;
+use CityIndex\WP\PostImporter\Modules;
 
 /**
  * Configuration Class.

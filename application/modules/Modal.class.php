@@ -1,28 +1,57 @@
 <?php
-namespace CityIndex\WP\PostExternal\Modules;
-use CityIndex\WP\PostExternal\Controller;
+namespace CityIndex\WP\PostImporter\Modules;
+use CityIndex\WP\PostImporter\Controller;
 
 /**
- * Class for handling the modal including tinymce integration
+ * Class for handling the modal including tinymce integration.
+ * 
+ * The namespacing for class's to deal with 3rd party services is in the format:
+ * Modal{$namespace}.class.php
+ * 
+ * All class's for each service must be registered in the services array in
+ * Modal::__construct() in the format:
+ * {$namespace} => 'normal name'
+ * 
+ * E.G. the service for googles gdrive would have the class:
+ * ModalGdrive.class.php
+ * and registered in Modal::services array in Modal::__construct() as:
+ * 'Gdrive' => 'Google Drive'
  * 
  * @author daithi
  * @package cityindex
- * @subpackage ci-wp-post-external
+ * @subpackage ci-wp-post-importer
  */
 class Modal extends Controller{
+	
+	/** @var array An array of services in {$namespace} => name pairs. */
+	private $services= array();
 	
 	/**
 	 * construct 
 	 */
 	function __construct(){
 		
+		//params
+		$services = array(
+			'Gdrive' => 'GDrive'
+		);
+		$this->script_deps = array('jquery');
 		$this->wp_action = array(
 			'init' => array(&$this, 'editor_tinymce'),
 			'admin_head' => array(&$this, 'admin_head'),
-			'wp_ajax_get_modal_editor' => array(&$this, 'get_dialog')
+			'wp_head' => array(&$this, 'admin_head'),
+			'wp_ajax_ci_post_importer_modal' => array(&$this,'get_dialog'),
+			'wp_ajax_ci_post_importer_load_service' => array(&$this, 'load_service')
 		);
 		
+		//calls
 		parent::__construct( __CLASS__ );
+		$this->register_services( $services );
+		
+		//set shortcodes for view file
+		$this->shortcodes = array(
+			'list services' => $this->view_list_services()
+		);		
 	}
 	
 	/**
@@ -30,12 +59,37 @@ class Modal extends Controller{
 	 */
 	public function admin_head(){
 		
-		$nonce = wp_create_nonce("post editor modal");
+		$dialog = wp_create_nonce("post importer modal dialog");
+		$services = wp_create_nonce("post importer get service");
+		$ajaxurl =  admin_url('admin-ajax.php'); 
 		?>
 		<script type="text/javascript">
-			var posteditor_modal_nonce = '<?=$nonce?>';
+			var ci_post_importer_nonces = {
+				get_dialog : '<?=$dialog?>',
+				services : '<?=$services?>'
+			};
+			var ci_post_importer_ajaxurl = '<?=$ajaxurl?>';
 		</script>
 		<?php
+	}
+	
+	/**
+	 * Handles all ajax requests to this module.
+	 */
+	public function ajax(){
+		
+		$service = @$_GET['service'];
+		
+		switch($service){
+			
+			case 'Gdrive':
+				
+				break;
+			
+			default:
+				$this->get_dialog();
+				break;
+		}
 	}
 	
 	/**
@@ -87,8 +141,12 @@ class Modal extends Controller{
 	 * 
 	 * @return void
 	 */
-	public function get_dialog(){
+	public function get_dialog( $html=false ){
 
+		//check nonce
+		if(!$html)	//if an ajax request
+			if(!$this->check_nonce("post importer modal dialog", false));
+		
 		//iframe head
 		?><html><head><?php
 		wp_enqueue_style('media');
@@ -98,12 +156,59 @@ class Modal extends Controller{
 		
 		//iframe body
 		?><body id="media-upload" class="js"><?php
-		$this->get_page();
+		($html) ? print $html : $this->get_page();
 		
 		//footer and die()
 		wp_footer();
 		?></body></html>
 		<?php
 		die();
+	}
+	
+	/**
+	 * Ajax callback. Loads a service.
+	 * 
+	 * Loads the service class and calls methods defined in 
+	 * $_REQUEST['ci_post_importer_action'].
+	 */
+	public function load_service(){
+		
+		//security check
+		$this->check_nonce("post importer get service");
+		
+		//load service
+		$class = "\CityIndex\WP\PostImporter\Modules\Modal{$_REQUEST['service']}";
+		$service = new $class();
+		
+		//if no actions default to loading view file
+		if(!@$_REQUEST[ $this->config->action_key ])
+			$this->get_dialog( $service->get_page(true) );
+			
+		ar_print($_REQUEST);
+		
+		die();
+	}
+	
+	/**
+	 * Shortcode callback. Returns html list of services for the view file.
+	 *
+	 * @return string
+	 */
+	private function view_list_services(){
+		
+		$ret = "<ul>\n";
+		
+		foreach($this->services as $class => $name)
+			$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$class}')\">{$name}</a></li>\n";
+		
+		return "{$ret}\n</ul>\n";
+	}
+	
+	/**
+	 * Registers 3rd party services. See the class description for more
+	 * information.
+	 */
+	private function register_services( array $services ){
+		$this->services = $services;
 	}
 }
