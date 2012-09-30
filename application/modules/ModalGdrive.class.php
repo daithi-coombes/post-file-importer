@@ -119,7 +119,7 @@ class ModalGdrive extends Controller{
 			'redirect_uri' => $this->redirect_uri,
 			'grant_type' => 'authorization_code'
 		);
-		
+		$user_id = get_current_user_id();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -134,6 +134,7 @@ class ModalGdrive extends Controller{
 		
 		//set params
 		if(@$res->refresh_token) $this->refresh_token = $res->refresh_token;
+		update_user_meta($user_id, "ci_post_importer_gdrive_refresh_token", $res->refresh_token);
 		//$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
@@ -178,6 +179,9 @@ class ModalGdrive extends Controller{
 			'access_token' => $this->access_token
 		));
 		$ret = "<ul>\n";
+		$user_id = get_current_user_id();
+		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
+		ar_print($user_meta);
 		if(!$this->access_token) $this->get_token();
 		
 		//get file list
