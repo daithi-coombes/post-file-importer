@@ -64,6 +64,7 @@ class ModalGdrive extends Controller{
 	private function get_token(){
 		
 		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_PORT, true);
@@ -106,6 +107,7 @@ class ModalGdrive extends Controller{
 					var url = window.opener.document.URL
 						+ '&saction=get_token&code='+code;
 					window.opener.location.href = url;
+					window.close();
 				});
 			</script>
 		</head><?php
