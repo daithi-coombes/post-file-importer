@@ -74,8 +74,18 @@ class ModalGdrive extends Controller{
 		wp_head();
 		?>
 				<script type="text/javascript">
+					function getUrlVars() {
+						var vars = {};
+						var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+							vars[key] = value;
+						});
+						return vars;
+					}
 					jQuery(document).ready(function($){
-						console.log($(window.opener));
+						var code = getUrlVars()['code'];
+						var url = window.opener.document.URL
+							+ '&saction=get_token&code='+code;
+						console.log(url);
 					});
 				</script>
 		</head><?php
