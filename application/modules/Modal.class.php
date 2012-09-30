@@ -174,7 +174,7 @@ class Modal extends Controller{
 	public function load_service(){
 		
 		//security check
-		if($_REQUEST['state']) $_REQUEST['_wpnonce'] = $_REQUEST['state'];
+		if(@$_REQUEST['state']) $_REQUEST['_wpnonce'] = $_REQUEST['state'];
 		ar_print($_REQUEST);
 		$this->check_nonce("post importer get service");
 		
@@ -186,8 +186,6 @@ class Modal extends Controller{
 		if(!@$_REQUEST[ $this->config->action_key ])
 			$this->get_dialog( $service->get_page(true) );
 			
-		ar_print($_REQUEST);
-		
 		die();
 	}
 	

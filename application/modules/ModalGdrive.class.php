@@ -23,7 +23,7 @@ class ModalGdrive extends Controller{
 	/** @var string The google app client id */
 	private $client_id = "525588897138.apps.googleusercontent.com";
 	/** @var string The google app redirect uri */
-	private $redirect_uri = "http://david-coombes.com/wp-admin/admin-ajax.php?action=post_importer_load_service&service=Gdrive&action=oauthCallback";
+	private $redirect_uri = "http://david-coombes.com/wp-admin/admin-ajax.php?action=ci_post_importer_load_service&service=Gdrive&action=oauthCallback";
 	
 	public function __construct(){
 		
