@@ -51,7 +51,7 @@ class ModalGdrive extends Controller{
 			'client_id' => $this->client_id,
 			'redirect_uri' => $this->redirect_uri,
 			'scope' => 'https://docs.google.com/feeds/',
-			'state' => 'this is the state',
+			'state' => wp_create_nonce("post importer get service"),
 			'access_type' => 'offline',
 			'approval_prompt' => 'auto'
 		));
