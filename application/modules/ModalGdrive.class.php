@@ -22,8 +22,12 @@ class ModalGdrive extends Controller{
 	
 	/** @var string The google app client id */
 	private $client_id = "525588897138.apps.googleusercontent.com";
+	/** @var string The google app secret */
+	private $client_secret = "5ZmQikl__N5sxnZ7g_tL2F2e";
 	/** @var string The google app redirect uri */
 	private $redirect_uri = "http://david-coombes.com/wp-admin/admin-ajax.php?action=ci_post_importer_load_service&service=Gdrive&saction=oauthCallback";
+	/** @var string The google app scope */
+	private $scope = 'https://docs.google.com/feeds/';
 	
 	public function __construct(){
 		
@@ -50,7 +54,7 @@ class ModalGdrive extends Controller{
 			'response_type' => 'code',
 			'client_id' => $this->client_id,
 			'redirect_uri' => $this->redirect_uri,
-			'scope' => 'https://docs.google.com/feeds/',
+			'scope' => $this->scope,
 			'state' => wp_create_nonce("post importer get service"),
 			'access_type' => 'offline',
 			'approval_prompt' => 'auto'
@@ -66,6 +70,8 @@ class ModalGdrive extends Controller{
 		$params = array(
 			'code' => $_REQUEST['code'],
 			'client_id' => $this->client_id,
+			'client_secret' => $this->client_secret,
+			'scope' => $this->scope,
 			'redirect_uri' => $this->redirect_uri,
 			'grant_type' => 'authorization_code'
 		);
