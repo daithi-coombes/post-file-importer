@@ -175,7 +175,6 @@ class Modal extends Controller{
 		
 		//security check
 		if(@$_REQUEST['state']) $_REQUEST['_wpnonce'] = $_REQUEST['state'];
-		ar_print($_REQUEST);
 		$this->check_nonce("post importer get service");
 		
 		//load service

@@ -57,8 +57,24 @@ class ModalGdrive extends Controller{
 		));
 	}
 	
+	/**
+	 * Callback to get access token
+	 *  
+	 */
 	private function get_token(){
-		ar_print($_REQUEST);
+		
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_PORT, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, array(
+			'code' => $_REQUEST['code'],
+			'client_id' => $this->client_id,
+			'redirect_uri' => $this->redirect_uri,
+			'grant_type' => 'authorization_code'
+		));
+		$res = curl_exec($ch);
+		ar_print($res);
 	}
 	
 	/**
@@ -89,7 +105,6 @@ class ModalGdrive extends Controller{
 					var code = getUrlVars()['code'];
 					var url = window.opener.document.URL
 						+ '&saction=get_token&code='+code;
-					console.log(url);
 					window.opener.location.href = url;
 				});
 			</script>
