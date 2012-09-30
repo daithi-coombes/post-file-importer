@@ -167,17 +167,28 @@ class ModalGdrive extends Controller{
 		
 		ar_print("listing files...");
 		
+		//vars
 		$ch = curl_init();
 		$url = url_query_append("https://www.googleapis.com/drive/v2/files", array(
 			'access_token' => $this->access_token
 		));
+		$res = "<ul>\n";
+		
+		//get file list
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
 		ar_print($res);
 		
-		return "<ul><li>this</li><li>is</li><li>the</li><li>file</li><li>list</li></ul>\n";
+		//error report
+		if(@$res->error)
+			return print "<div class=\"error\">{$res->error}</div>\n";
+		
+		//build html and return
+		foreach($res->items as $file)
+			$res .= "<li>{$file->title}</li>\n";
+		return "{$res}</ul>\n";
 	}
 	
 	/**
