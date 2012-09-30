@@ -26,6 +26,8 @@ class ModalGdrive extends Controller{
 	private $client_secret = "5ZmQikl__N5sxnZ7g_tL2F2e";
 	/** @var string The google app redirect uri */
 	private $redirect_uri = "http://david-coombes.com/wp-admin/admin-ajax.php?action=ci_post_importer_load_service&service=Gdrive&saction=oauthCallback";
+	/** @var string The refresh token to keep user signed in */
+	private $refresh_token = "";
 	/** @var string The google app scope */
 	private $scope = 'https://docs.google.com/feeds/';
 	
@@ -87,7 +89,15 @@ class ModalGdrive extends Controller{
 		
 		//error report
 		if(@$res->error)
-			print "<div class=\"error\">{$res->error}</div>\n";
+			return print "<div class=\"error\">{$res->error}</div>\n";
+		
+		//set params
+		//$this->refresh_token = $res->refresh_token;
+		$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
+		$this->access_token = $res->access_token;
+		
+		
+		ar_print($this);
 	}
 	
 	/**
