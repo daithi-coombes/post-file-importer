@@ -86,6 +86,7 @@ class ModalGdrive extends Controller{
 						var url = window.opener.document.URL
 							+ '&saction=get_token&code='+code;
 						console.log(url);
+						window.opener.location.href = url;
 					});
 				</script>
 		</head><?php
