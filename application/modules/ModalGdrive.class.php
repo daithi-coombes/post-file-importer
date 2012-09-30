@@ -23,6 +23,15 @@ class ModalGdrive extends Controller{
 	public function __construct(){
 		
 		parent::__construct(__CLASS__);
+		
+		//look for actions
+		$action = $_REQUEST['action'];
+		if(method_exists($this, $action))
+			$this->$action();
+	}
+	
+	private function oauthCallback(){
+		ar_print($_REQUEST);
 	}
 }
 
