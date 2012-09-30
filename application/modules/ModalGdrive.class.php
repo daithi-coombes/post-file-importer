@@ -63,7 +63,30 @@ class ModalGdrive extends Controller{
 	 * This code is then sent back to google to get an access token. 
 	 */
 	private function oauthCallback(){
-		ar_print($_REQUEST);
+		
+		//html head
+		?><html><head><?php
+		wp_enqueue_script('jquery');
+		wp_enqueue_style('media');
+		wp_enqueue_style('colors');
+		wp_head();
+		?>
+				<script type="text/javascript">
+					jQuery(document).ready(function($){
+						console.log($(window.opener));
+					});
+				</script>
+		</head><?php
+		
+		//html body
+		?><body id="media-upload" class="js"><?php
+		($html) ? print $html : $this->get_page();
+		
+		//footer and die()
+		wp_footer();
+		?></body></html>
+		<?php
+		die();
 	}
 }
 
