@@ -29,7 +29,9 @@ class ModalGdrive extends Controller{
 	/** @var string The refresh token to keep user signed in */
 	private $refresh_token = "";
 	/** @var string The google app scope */
-	private $scope = 'https://docs.google.com/feeds/ https://www.googleapis.com/auth/userinfo.profile';
+	private $scope = 'https://docs.google.com/feeds/ https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+	/** @var object The authenticated user details */
+	private $user;
 	
 	public function __construct(){
 		
@@ -128,15 +130,19 @@ class ModalGdrive extends Controller{
 		$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
-		ar_print($this->access_token);
 		//get user info
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/oauth2/v1/userinfo?access_token={$this->access_token}");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
 		
+		//error report
+		if(@$res->error)
+			return print "<div class=\"error\">{$res->error}</div>\n";
+		
+		//set user
+		$this->user = $res;		
 	}
 	
 	/**
@@ -158,6 +164,19 @@ class ModalGdrive extends Controller{
 	 * @return string 
 	 */
 	private function list_files(){
+		
+		ar_print("listing files...");
+		
+		$ch = curl_init();
+		$url = url_query_append("https://www.googleapis.com/drive/v2/files", array(
+			'access_token' => $this->access_token
+		));
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$res = json_decode(curl_exec($ch));
+		ar_print($res);
+		
 		return "<ul><li>this</li><li>is</li><li>the</li><li>file</li><li>list</li></ul>\n";
 	}
 	
