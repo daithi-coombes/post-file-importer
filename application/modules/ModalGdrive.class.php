@@ -69,7 +69,6 @@ class ModalGdrive extends Controller{
 			'redirect_uri' => $this->redirect_uri,
 			'grant_type' => 'authorization_code'
 		);
-		ar_print($params);
 		
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
@@ -77,8 +76,11 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		$res = curl_exec($ch);
-		ar_print($res);
+		$res = json_decode(curl_exec($ch));
+		
+		//error report
+		if($res->error)
+			print "<div class=\"error\">{$res->error}</div>\n";
 	}
 	
 	/**
