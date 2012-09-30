@@ -34,16 +34,47 @@ class ModalGdrive extends Controller{
 	public function __construct(){
 		
 		//params
-		$this->shortcodes = array(
-			'gauth url' => $this->get_url()
-		);
-		
-		parent::__construct(__CLASS__);
+		parent::__construct( __CLASS__ );
 		
 		//look for actions
 		$action = @$_REQUEST['saction'];
 		if(method_exists($this, $action))
 			$this->$action();
+	}
+	
+	/**
+	 * Prints the view html.
+	 * 
+	 * Loads the html then sets shortcodes,loads scripts and styles then prints 
+	 * html.
+	 * 
+	 * @param boolean $return Default false. If true will return html if not
+	 * will print.
+	 * @return type 
+	 */
+	public function get_page( $return=false ) {
+
+		//vars
+		$this->html = file_get_contents("{$this->config->plugin_dir}/public_html/ModalGdrive.php");
+		
+		//clean out phpDoc
+		$this->html = preg_replace("/<\?php.+\?>/msU", "", $this->html);
+		
+		$this->shortcodes = array(
+			'gauth url' => $this->get_url(),
+			'list files' => $this->list_files(),
+			'class logged in' => $this->get_view_class( true ),
+			'class logged out' => $this->get_view_class( false )
+		);		
+		$this->shortcodes['errors'] = $this->get_errors();
+		$this->shortcodes['messages'] = $this->get_messages();
+		
+		$this->set_shortcodes();
+		$this->load_scripts();
+		$this->load_styles();
+
+		if(!$return) print $this->html;
+		return $this->html;
 	}
 	
 	/**
@@ -69,6 +100,8 @@ class ModalGdrive extends Controller{
 	 */
 	private function get_token(){
 		
+		ar_print("<h1>get_token()</h1>");
+		
 		$params = array(
 			'code' => $_REQUEST['code'],
 			'client_id' => $this->client_id,
@@ -85,7 +118,6 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
 		
 		//error report
 		if(@$res->error)
@@ -98,6 +130,19 @@ class ModalGdrive extends Controller{
 		
 		
 		ar_print($this);
+	}
+	
+	private function get_view_class( $logged_in ){
+		if(
+			(!$logged_in && !$this->refresh_token) ||
+			($logged_in && $this->refresh_token)
+		) return "";
+		return "style=\"display:none\"";
+	}
+	
+	private function list_files(){
+		
+		return "<ul><li>this</li><li>is</li><li>the</li><li>file</li><li>list</li></ul>\n";
 	}
 	
 	/**

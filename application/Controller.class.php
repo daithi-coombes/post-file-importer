@@ -33,7 +33,7 @@ class Controller{
 	/** @var string Camel case child class name */
 	private $class_name = false;
 	/** @var string The html code for the view file */
-	private $html = false;
+	public $html = false;
 	
 	/**
 	 * Construct controller.
@@ -174,7 +174,7 @@ class Controller{
 	 * 
 	 * @return string Returns an html <ul> list of errors.
 	 */
-	private function get_errors(){
+	public function get_errors(){
 		
 		$html = "<div id=\"message\" class=\"error\"><ul>\n";
 		$errors = $this->config->errors;
@@ -190,7 +190,7 @@ class Controller{
 		return $html .= "</ul>\n</div>\n";
 	}
 	
-	private function get_messages(){
+	public function get_messages(){
 		
 		$html = "<div id=\"message\" class=\"message\"><ul>\n";
 		$messages = $this->config->messages;
@@ -273,7 +273,7 @@ class Controller{
 	 * 
 	 * @return void
 	 */
-	private function set_shortcodes() {
+	public function set_shortcodes() {
 		
 		//replace values
 		if(count(@$this->shortcodes))
