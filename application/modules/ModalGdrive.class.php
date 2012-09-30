@@ -192,8 +192,7 @@ class ModalGdrive extends Controller{
 		
 		//build html and return
 		foreach($res->items as $file)
-			if(!is_string($file->title)) $res .= "<li>{$file->title}</li>\n";
-			else ar_print($file->title);
+			$res .= "<li>" . (string) $file->title ."</li>\n";
 			
 		return "{$res}</ul>\n";
 	}
