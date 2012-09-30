@@ -38,6 +38,8 @@ class ModalGdrive extends Controller{
 		//params
 		parent::__construct( __CLASS__ );
 		
+		$this->check_state();
+		
 		//look for actions
 		$action = @$_REQUEST['saction'];
 		if(method_exists($this, $action))
@@ -65,8 +67,8 @@ class ModalGdrive extends Controller{
 		$this->shortcodes = array(
 			'gauth url' => $this->get_url(),
 			'list files' => $this->list_files(),
-			'class logged in' => $this->get_view_class( true ),
-			'class logged out' => $this->get_view_class( false )
+			'class logged in' => $this->get_view_class(),
+			'class logged out' => $this->get_view_class()
 		);		
 		$this->shortcodes['errors'] = $this->get_errors();
 		$this->shortcodes['messages'] = $this->get_messages();
@@ -94,6 +96,11 @@ class ModalGdrive extends Controller{
 			'access_type' => 'offline',
 			'approval_prompt' => 'auto'
 		));
+	}
+	
+	private function check_state(){
+		
+		if(!$this->refresh_token) $this->user = false;
 	}
 	
 	/**
@@ -126,8 +133,8 @@ class ModalGdrive extends Controller{
 			return print "<div class=\"error\">{$res->error}</div>\n";
 		
 		//set params
-		//$this->refresh_token = $res->refresh_token;
-		$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
+		$this->refresh_token = $res->refresh_token;
+		//$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
 		//get user info
@@ -152,11 +159,8 @@ class ModalGdrive extends Controller{
 	 * @return string 
 	 */
 	private function get_view_class( $logged_in ){
-		if(
-			(!$logged_in && !$this->refresh_token) ||
-			($logged_in && $this->refresh_token)
-		) return "";
-		return "style=\"display:none\"";
+		if( $logged_in && !$this->user ) return "style=\"display:none\"";
+		return "";
 	}
 	
 	/**
