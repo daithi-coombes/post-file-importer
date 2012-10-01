@@ -42,13 +42,16 @@ class ModalGdrive extends Controller{
 		//params
 		parent::__construct( __CLASS__ );
 		
-		//set params if refresh token is available.
+		//default methods
+		$this->refresh_token = $this->get_refresh_token();
 		$this->check_state();
 		
 		//look for actions
 		$action = @$_REQUEST['saction'];
 		if(method_exists($this, $action))
 			$this->$action();
+		
+		ar_print($this);
 	}
 	
 	/**
@@ -108,31 +111,58 @@ class ModalGdrive extends Controller{
 	 */
 	private function check_state(){
 		
+		//if refresh token, then get new access token
+		if($this->refresh_token)
+			$this->get_token( $this->refresh_token );
+		
+		
+	}
+	
+	/**
+	 * Get the refresh token for current user.
+	 *
+	 * @return mixed If found returns refresh token, false on failure. 
+	 */
+	private function get_refresh_token(){
 		$user_id = get_current_user_id();
 		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
-		if(@$user_meta[0]){
-			$this->refresh_token = $user_meta[0];
-		}
+		
+		if($user_meta[0]) return $user_meta[0];
+		else return false;
 	}
 	
 	/**
 	 * Callback to get access token
 	 *  
 	 */
-	private function get_token(){
+	private function get_token( $refresh_token=false ){
 		
 		ar_print("<h1>get_token()</h1>");
 		
-		$params = array(
-			'code' => $_REQUEST['code'],
-			'client_id' => $this->client_id,
-			'client_secret' => $this->client_secret,
-			'scope' => $this->scope,
-			'redirect_uri' => $this->redirect_uri,
-			'grant_type' => 'authorization_code'
-		);
+		//vars
 		$user_id = get_current_user_id();
 		$ch = curl_init();
+		
+		//first access
+		if($_REQUEST['code'])
+			$params = array(
+				'code' => $_REQUEST['code'],
+				'client_id' => $this->client_id,
+				'client_secret' => $this->client_secret,
+				'scope' => $this->scope,
+				'redirect_uri' => $this->redirect_uri,
+				'grant_type' => 'authorization_code'
+			);
+		//using refresh token
+		if($refresh_token)
+			$params = array(
+				'refresh_token' => $refresh_token,
+				'client_id' => $this->client_id,
+				'client_secret' => $this->client_secret,
+				'grant_type' => "refresh_token"
+			);
+		
+		//curl connect
 		curl_setopt($ch, CURLOPT_URL, "https://accounts.google.com/o/oauth2/token");
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -145,8 +175,7 @@ class ModalGdrive extends Controller{
 			return print "<div class=\"error\">{$res->error}</div>\n";
 		
 		//set params
-		if(@$res->refresh_token) $this->refresh_token = $res->refresh_token;
-		update_user_meta($user_id, "ci_post_importer_gdrive_refresh_token", $res->refresh_token);
+		if(@$res->refresh_token) $this->set_refresh_token( $res->refresh_token ); //$this->refresh_token = $res->refresh_token;
 		//$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
 		$this->access_token = $res->access_token;
 		
@@ -257,6 +286,16 @@ class ModalGdrive extends Controller{
 		?></body></html>
 		<?php
 		die();
+	}
+	
+	/**
+	 * Sets refresh token for current user.
+	 * 
+	 * @param string $refresh_token 
+	 */
+	private function set_refresh_token( $refresh_token ){
+		$user_id = get_current_user_id();
+		update_user_meta($user_id, "ci_post_importer_gdrive_refresh_token", $refresh_token);		
 	}
 }
 
