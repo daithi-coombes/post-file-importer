@@ -116,6 +116,7 @@ class ModalGdrive extends Controller{
 			if($stdout) print "<div class=\"error\">Can't get gauth user info, not connected</div>\n";
 			return false;
 		}
+		return true;
 	}
 	
 	/**
@@ -191,6 +192,11 @@ class ModalGdrive extends Controller{
 		return $res->access_token;		
 	}
 	
+	/**
+	 * Get the google account info for current logged in user.
+	 * 
+	 * @return boolean Returns google user info on success, false on failure.
+	 */
 	private function get_user_info(){
 		
 		//check connected
