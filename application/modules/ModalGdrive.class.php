@@ -148,7 +148,7 @@ class ModalGdrive extends Controller{
 		//if no code or refresh token, then this is first run. Login link will be displayed in view file
 		if(@!$_REQUEST['code'] && !$this->refresh_token)
 			return false;
-		
+		ar_print($this);
 		//vars
 		$ch = curl_init();
 		$params = array();
