@@ -2,11 +2,6 @@
 namespace CityIndex\WP\PostImporter\Modules;
 use CityIndex\WP\PostImporter\Controller;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of ModalGdrive.
  * 
@@ -16,6 +11,15 @@ use CityIndex\WP\PostImporter\Controller;
  * client authenticates user
  * clients sends success/false to google
  *
+ * @todo in construct check if refresh token is there ($this->check_state())
+ * @todo if refresh token then request new access token for this session
+ * @todo if refresh and access token, then list files
+ * @todo change redirect url to be same as default. In class construct determine
+ * if listing files or showing login link. List files:
+ * - If $_REQUEST['code'] is available then get access/refresh tokens.
+ * - If refresh token, get new access token, list files
+ * Show gauth login link:
+ * - If no $_REQUEST['code'] and no stored refresh token show login link
  * @author daithi
  */
 class ModalGdrive extends Controller{
@@ -38,6 +42,7 @@ class ModalGdrive extends Controller{
 		//params
 		parent::__construct( __CLASS__ );
 		
+		//set params if refresh token is available.
 		$this->check_state();
 		
 		//look for actions
@@ -98,9 +103,16 @@ class ModalGdrive extends Controller{
 		));
 	}
 	
+	/**
+	 * Checks if refresh_token is available and sets params.
+	 */
 	private function check_state(){
 		
-		if(!$this->refresh_token) $this->user = false;
+		$user_id = get_current_user_id();
+		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
+		if(@$user_meta[0]){
+			$this->refresh_token = $user_meta[0];
+		}
 	}
 	
 	/**
@@ -181,7 +193,6 @@ class ModalGdrive extends Controller{
 		$ret = "<ul>\n";
 		$user_id = get_current_user_id();
 		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
-		ar_print($user_meta);
 		if(!$this->access_token) $this->get_token();
 		
 		//get file list
