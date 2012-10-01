@@ -148,7 +148,7 @@ class ModalGdrive extends Controller{
 		//if no code or refresh token, then this is first run. Login link will be displayed in view file
 		if(@!$_REQUEST['code'] && !$this->refresh_token)
 			return false;
-		ar_print($this);
+		
 		//vars
 		$ch = curl_init();
 		$params = array();
@@ -179,10 +179,9 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
 		
-		//error report
 		if(@$res->error){
+			$this->set_refresh_token(false);
 			print "<div class=\"error\">{$res->error}</div>\n";
 			return false;
 		}
@@ -208,7 +207,6 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
 		
 		//error report
 		if(@$res->error){
@@ -251,8 +249,8 @@ class ModalGdrive extends Controller{
 	 */
 	private function list_files(){
 		
-		if(!$this->user) return "";
-		ar_print("listing files...");
+		//if not logged in
+		if(!$this->check_state()) return "";
 		
 		//vars
 		$ch = curl_init();
