@@ -24,6 +24,8 @@ use CityIndex\WP\PostImporter\Controller;
  */
 class ModalGdrive extends Controller{
 	
+	/** @var string The current valid token */
+	private $access_token = false;
 	/** @var string The google app client id */
 	private $client_id = "525588897138.apps.googleusercontent.com";
 	/** @var string The google app secret */
@@ -31,7 +33,7 @@ class ModalGdrive extends Controller{
 	/** @var string The google app redirect uri */
 	private $redirect_uri = "http://david-coombes.com/wp-admin/admin-ajax.php?action=ci_post_importer_load_service&service=Gdrive&saction=oauthCallback";
 	/** @var string The refresh token to keep user signed in */
-	private $refresh_token = "";
+	private $refresh_token = false;
 	/** @var string The google app scope */
 	private $scope = 'https://docs.google.com/feeds/ https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 	/** @var object The authenticated user details */
@@ -43,8 +45,9 @@ class ModalGdrive extends Controller{
 		parent::__construct( __CLASS__ );
 		
 		//default methods
-		$this->refresh_token = $this->get_refresh_token();
-		$this->check_state();
+		$this->refresh_token = $this->get_refresh_token();	//looks in user metadata
+		$this->access_token = $this->get_access_token();	//connects to gmail for token
+		$this->user = $this->get_user_info();				//gets gmail user info (needed for some gdrive requests)
 		
 		//look for actions
 		$action = @$_REQUEST['saction'];
@@ -109,13 +112,12 @@ class ModalGdrive extends Controller{
 	/**
 	 * Checks if refresh_token is available and sets params.
 	 */
-	private function check_state(){
+	private function check_state( $stdout=false ){
 		
-		//if refresh token, then get new access token
-		if($this->refresh_token)
-			$this->get_token( $this->refresh_token );
-		
-		
+		if(!$this->access_token){
+			if($stdout) print "<div class=\"error\">Can't get gauth user info, not connected</div>\n";
+			return false;
+		}
 	}
 	
 	/**
@@ -132,19 +134,27 @@ class ModalGdrive extends Controller{
 	}
 	
 	/**
-	 * Callback to get access token
+	 * Callback to get access token.
+	 * 
+	 * If first request then $_REQUEST['code'] will be set and a refresh token
+	 * will be returned by google servers.
+	 * 
+	 * If not first run then refresh token will be used to get another token
+	 * from the gmail servers.
 	 *  
+	 * @return string Returns the access token.
 	 */
-	private function get_token( $refresh_token=false ){
+	private function get_access_token(){
 		
-		ar_print("<h1>get_token()</h1>");
+		//if no code or refresh token, then this is first run. Login link will be displayed in view file
+		if(@$_REQUEST['code'] && !$this->refresh_token)
+			return false;
 		
 		//vars
-		$user_id = get_current_user_id();
 		$ch = curl_init();
 		
 		//first access
-		if($_REQUEST['code'])
+		if(@$_REQUEST['code'])
 			$params = array(
 				'code' => $_REQUEST['code'],
 				'client_id' => $this->client_id,
@@ -171,13 +181,20 @@ class ModalGdrive extends Controller{
 		$res = json_decode(curl_exec($ch));
 		
 		//error report
-		if(@$res->error)
-			return print "<div class=\"error\">{$res->error}</div>\n";
+		if(@$res->error){
+			print "<div class=\"error\">{$res->error}</div>\n";
+			return false;
+		}
 		
 		//set params
-		if(@$res->refresh_token) $this->set_refresh_token( $res->refresh_token ); //$this->refresh_token = $res->refresh_token;
-		//$this->refresh_token = "1/19eqqPiEFRdYNDqQ8X8vH-hpKq7cSS9YDgFrX7lj4v8";
-		$this->access_token = $res->access_token;
+		if(@$res->refresh_token) $this->set_refresh_token( $res->refresh_token );
+		return $res->access_token;		
+	}
+	
+	private function get_user_info(){
+		
+		//check connected
+		if(!$this->check_state()) return false;
 		
 		//get user info
 		$ch = curl_init();
@@ -187,11 +204,13 @@ class ModalGdrive extends Controller{
 		$res = json_decode(curl_exec($ch));
 		
 		//error report
-		if(@$res->error)
-			return print "<div class=\"error\">{$res->error}</div>\n";
+		if(@$res->error){
+			print "<div class=\"error\">{$res->error}</div>\n";
+			return false;
+		}
 		
 		//set user
-		$this->user = $res;		
+		$this->user = $res;
 	}
 	
 	/**
