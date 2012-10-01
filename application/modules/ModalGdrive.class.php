@@ -178,6 +178,7 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		$res = json_decode(curl_exec($ch));
+		ar_print($res);
 		
 		//error report
 		if(@$res->error){
@@ -185,7 +186,7 @@ class ModalGdrive extends Controller{
 			return false;
 		}
 		
-		//set params
+		//set params and return
 		if(@$res->refresh_token) $this->set_refresh_token( $res->refresh_token );
 		return $res->access_token;		
 	}
@@ -201,6 +202,7 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
+		ar_print($res);
 		
 		//error report
 		if(@$res->error){
@@ -209,7 +211,7 @@ class ModalGdrive extends Controller{
 		}
 		
 		//set user
-		$this->user = $res;
+		return $res;
 	}
 	
 	/**
