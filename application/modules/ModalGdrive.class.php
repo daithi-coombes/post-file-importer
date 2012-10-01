@@ -229,8 +229,8 @@ class ModalGdrive extends Controller{
 	private function get_view_class( $logged_in ){
 		
 		//vars
-		$show = "style=\"display:none\"";
-		$hide = "";
+		$hide = "style=\"display:none\"";
+		$show = "";
 		
 		//for logged in div
 		if($logged_in)
@@ -241,8 +241,8 @@ class ModalGdrive extends Controller{
 		//for not logged in div
 		if(!$logged_in)
 			if($this->check_state())	//logged in
-				return $show;
-			else return $hide;			//logged out
+				return $hide;
+			else return $show;			//logged out
 	}
 	
 	/**
