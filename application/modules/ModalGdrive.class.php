@@ -39,6 +39,9 @@ class ModalGdrive extends Controller{
 	/** @var object The authenticated user details */
 	private $user;
 	
+	/**
+	 * construct. 
+	 */
 	public function __construct(){
 		
 		//params
