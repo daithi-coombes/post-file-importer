@@ -53,8 +53,6 @@ class ModalGdrive extends Controller{
 		$action = @$_REQUEST['saction'];
 		if(method_exists($this, $action))
 			$this->$action();
-		
-		ar_print($this);
 	}
 	
 	/**
@@ -152,6 +150,7 @@ class ModalGdrive extends Controller{
 		
 		//vars
 		$ch = curl_init();
+		$params = array();
 		
 		//first access
 		if(@$_REQUEST['code'])
@@ -164,9 +163,9 @@ class ModalGdrive extends Controller{
 				'grant_type' => 'authorization_code'
 			);
 		//using refresh token
-		if($refresh_token)
+		if($this->refresh_token)
 			$params = array(
-				'refresh_token' => $refresh_token,
+				'refresh_token' => $this->refresh_token,
 				'client_id' => $this->client_id,
 				'client_secret' => $this->client_secret,
 				'grant_type' => "refresh_token"
