@@ -215,9 +215,6 @@ class ModalGdrive extends Controller{
 			'access_token' => $this->access_token,
 			'folderId' => 'root'
 		));
-		$ret = "<ul>\n";
-		$user_id = get_current_user_id();
-		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
 		if(!$this->access_token) $this->get_token();
 		
 		//get file list
@@ -227,8 +224,7 @@ class ModalGdrive extends Controller{
 		$res = json_decode(curl_exec($ch));
 		
 		//error report
-		if(@$res->error)
-			return print "<div class=\"error\">{$res->error}</div>\n";
+		if(@$res->error) return new \WP_Error( 0, $res->error );
 		
 		/**
 		 * Build hierarchical list of files/folders
@@ -309,7 +305,13 @@ class ModalGdrive extends Controller{
 		
 		$files = $this->get_files('root');
 		$ret = "<ul>\n";
+		ar_print($files);
 		
+		//error report
+		if(is_wp_error($files))
+			return "<div class=\"error\">{$files->get_error_message ()}</div>\n";
+		
+		//build list and return
 		foreach($files['folders'] as $folder)
 			$ret .= "<li>{$folder->title}</li>\n";
 		
