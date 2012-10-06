@@ -211,7 +211,7 @@ class ModalGdrive extends Controller{
 		$ch = curl_init();
 		$folders = array();
 		$files = array();
-		$url = url_query_append("https://www.googleapis.com/drive/v2/files/root/children", array(
+		$url = url_query_append("https://www.googleapis.com/drive/v2/files/", array(
 			'access_token' => $this->access_token,
 			'folderId' => 'root'
 		));
