@@ -282,7 +282,7 @@ class ModalGdrive extends Controller{
 		 */
 		foreach($res->items as $file){
 			print $file->mimeType;
-			if(strpos("application/vnd.google-apps.folder", @$file->mimeType))
+			if(@$file->mimeType == "application/vnd.google-apps.folder")
 				$folders[] = $file;
 			else
 				$files[] = $file;
