@@ -281,7 +281,7 @@ class ModalGdrive extends Controller{
 		 * Build hierarchical list of files/folders
 		 */
 		foreach($res->items as $file){
-			print $file->mimeType;
+			ar_print($file->mimeType);
 			if(@$file->mimeType == "application/vnd.google-apps.folder")
 				$folders[] = $file;
 			else
