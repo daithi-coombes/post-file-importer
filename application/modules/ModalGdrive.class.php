@@ -275,12 +275,16 @@ class ModalGdrive extends Controller{
 		if(@$res->error)
 			return print "<div class=\"error\">{$res->error}</div>\n";
 		
-		ar_print($res);
-            
-		//build html and return
+		/**
+		 * Build hierarchical list of files/folders
+		 */
 		foreach($res->items as $file){
-			$ret .= "<li>{$file->title}</li>\n";
+			if(strpos("application/vnd.google-apps.folder", $file->type))
+				$folders[] = $file;
+			else
+				$files[] = $file;
 		}
+		ar_print($folders);
 			
 		return "{$ret}</ul>\n";
 	}
