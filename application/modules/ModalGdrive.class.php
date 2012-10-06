@@ -131,7 +131,7 @@ class ModalGdrive extends Controller{
 		$user_id = get_current_user_id();
 		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
 		
-		if($user_meta[0]) return $user_meta[0];
+		if(@$user_meta[0]) return $user_meta[0];
 		else return false;
 	}
 	
@@ -275,6 +275,8 @@ class ModalGdrive extends Controller{
 		if(@$res->error)
 			return print "<div class=\"error\">{$res->error}</div>\n";
 		
+		ar_print($res);
+            
 		//build html and return
 		foreach($res->items as $file){
 			$ret .= "<li>{$file->title}</li>\n";
