@@ -195,6 +195,54 @@ class ModalGdrive extends Controller{
 	}
 	
 	/**
+	 * Get a list of files for a directory
+	 * 
+	 * Returns a list of children.
+	 * 
+	 * @param string $parent
+	 * @return array 
+	 */
+	private function get_files( $parent=false ){
+		
+		//if not logged in
+		if(!$this->check_state()) return "";
+		
+		//vars
+		$ch = curl_init();
+		$folders = array();
+		$files = array();
+		$url = url_query_append("https://www.googleapis.com/drive/v2/files/root/children", array(
+			'access_token' => $this->access_token,
+			'folderId' => 'root'
+		));
+		$ret = "<ul>\n";
+		$user_id = get_current_user_id();
+		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
+		if(!$this->access_token) $this->get_token();
+		
+		//get file list
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$res = json_decode(curl_exec($ch));
+		
+		//error report
+		if(@$res->error)
+			return print "<div class=\"error\">{$res->error}</div>\n";
+		
+		/**
+		 * Build hierarchical list of files/folders
+		 */
+		foreach($res->items as $file){
+			if((string) @$file->mimeType == "application/vnd.google-apps.folder")
+				$folders[] = $file;
+			else
+				$files[] = $file;
+		}
+		ar_print($folders);
+	}
+	
+	/**
 	 * Get the google account info for current logged in user.
 	 * 
 	 * @return boolean Returns google user info on success, false on failure.
