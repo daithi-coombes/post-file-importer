@@ -202,7 +202,7 @@ class ModalGdrive extends Controller{
 	 * @param string $parent
 	 * @return array 
 	 */
-	private function get_files( $parent=false ){
+	private function get_files( $parent="root" ){
 		
 		//if not logged in
 		if(!$this->check_state()) return "";
@@ -233,13 +233,17 @@ class ModalGdrive extends Controller{
 		/**
 		 * Build hierarchical list of files/folders
 		 */
-		foreach($res->items as $file){
+		foreach($res->items as $file)
 			if((string) @$file->mimeType == "application/vnd.google-apps.folder")
 				$folders[] = $file;
 			else
 				$files[] = $file;
-		}
-		ar_print($folders);
+		
+		//return result
+		return array(
+			'folders' => $folders,
+			'files' => $files
+		);
 	}
 	
 	/**
@@ -303,47 +307,14 @@ class ModalGdrive extends Controller{
 		//if not logged in
 		if(!$this->check_state()) return "";
 		
-		$files = $this->get_files();
-		
-		/**
-		 *@deprecated 
-		 *
-		//vars
-		$ch = curl_init();
-		$folders = array();
-		$files = array();
-		$url = url_query_append("https://www.googleapis.com/drive/v2/files", array(
-			'access_token' => $this->access_token
-		));
+		$files = $this->get_files('root');
 		$ret = "<ul>\n";
-		$user_id = get_current_user_id();
-		$user_meta = get_user_meta($user_id, "ci_post_importer_gdrive_refresh_token");
-		if(!$this->access_token) $this->get_token();
 		
-		//get file list
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$res = json_decode(curl_exec($ch));
+		foreach($files['folders'] as $folder)
+			$ret .= "<li>{$folder->title}</li>\n";
 		
-		//error report
-		if(@$res->error)
-			return print "<div class=\"error\">{$res->error}</div>\n";
-		
-		/**
-		 * Build hierarchical list of files/folders
-		 *
-		foreach($res->items as $file){
-			if((string) @$file->mimeType == "application/vnd.google-apps.folder")
-				$folders[] = $file;
-			else
-				$files[] = $file;
-		}
-		ar_print($folders);
-			
 		return "{$ret}</ul>\n";
-		 * 
-		 */
+		
 	}
 	
 	/**
