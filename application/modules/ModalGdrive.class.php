@@ -303,6 +303,11 @@ class ModalGdrive extends Controller{
 		//if not logged in
 		if(!$this->check_state()) return "";
 		
+		$files = $this->get_files();
+		
+		/**
+		 *@deprecated 
+		 *
 		//vars
 		$ch = curl_init();
 		$folders = array();
@@ -327,7 +332,7 @@ class ModalGdrive extends Controller{
 		
 		/**
 		 * Build hierarchical list of files/folders
-		 */
+		 *
 		foreach($res->items as $file){
 			if((string) @$file->mimeType == "application/vnd.google-apps.folder")
 				$folders[] = $file;
@@ -337,6 +342,8 @@ class ModalGdrive extends Controller{
 		ar_print($folders);
 			
 		return "{$ret}</ul>\n";
+		 * 
+		 */
 	}
 	
 	/**
