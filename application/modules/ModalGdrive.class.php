@@ -44,9 +44,6 @@ class ModalGdrive extends Controller{
 	 */
 	public function __construct(){
 		
-		//set controller params
-		$this->script_deps();
-		
 		//params
 		parent::__construct( __CLASS__ );
 		
