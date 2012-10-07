@@ -44,6 +44,9 @@ class ModalGdrive extends Controller{
 	 */
 	public function __construct(){
 		
+		//set controller params
+		$this->script_deps();
+		
 		//params
 		parent::__construct( __CLASS__ );
 		
@@ -213,7 +216,7 @@ class ModalGdrive extends Controller{
 		$files = array();
 		$url = url_query_append("https://www.googleapis.com/drive/v2/files/", array(
 			'access_token' => $this->access_token,
-			'folderId' => 'root'
+			'folderId' => $parent
 		));
 		if(!$this->access_token) $this->get_token();
 		
@@ -225,6 +228,8 @@ class ModalGdrive extends Controller{
 		
 		//error report
 		if(@$res->error) return new \WP_Error( 0, $res->error );
+		
+		print serialize($res);
 		
 		/**
 		 * Build hierarchical list of files/folders
@@ -295,6 +300,7 @@ class ModalGdrive extends Controller{
 	}
 	
 	/**
+	 * Returns html list of files.
 	 * 
 	 * @return string 
 	 */
@@ -314,6 +320,8 @@ class ModalGdrive extends Controller{
 		//build list and return
 		foreach($files['folders'] as $folder)
 			$ret .= "<li>{$folder->title}</li>\n";
+		foreach($files['files'] as $file)
+			$ret .= "<li>{$file->title}</li>\n";
 		
 		return "{$ret}</ul>\n";
 		

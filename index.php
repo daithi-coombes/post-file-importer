@@ -42,8 +42,12 @@ $config->init_modules = array(
 	'Modal'
 );
 $config->third_party = array(
-	'script' => array(),
-	'css' => array()
+	'script' => array(
+		'jstree' => PLUGIN_URL . "/application/includes/jstree/jquery.jstree.js"
+	),
+	'css' => array(
+		'jstree' => PLUGIN_URL . "/application/includes/jstree/themes/default/styles.css"
+	)
 );
 $config->modal_tables = array(
 	/*
