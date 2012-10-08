@@ -214,7 +214,7 @@ class ModalGdrive extends Controller{
 		
 		/**
 		 *debug. 
-		 */
+		 *
 		$data = file_get_contents("http://wordpress.loc/3.4.2/test/gdrive_data.php");
 		$res = json_decode($data);
 		foreach($res->items as $file)
@@ -228,7 +228,7 @@ class ModalGdrive extends Controller{
 			'folders' => $folders,
 			'files' => $files
 		);
-		/**
+		**
 		 *end debug 
 		 */
 		
