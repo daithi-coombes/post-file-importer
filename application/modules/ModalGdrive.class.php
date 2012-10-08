@@ -44,6 +44,14 @@ class ModalGdrive extends Controller{
 	 */
 	public function __construct(){
 		
+		$this->script_deps = array(
+			'jquery',
+			'jstree'
+		);
+		$this->style_deps = array(
+			'jstree'
+		);
+		
 		//params
 		parent::__construct( __CLASS__ );
 		
@@ -204,6 +212,26 @@ class ModalGdrive extends Controller{
 	 */
 	private function get_files( $parent="root" ){
 		
+		/**
+		 *debug. 
+		 */
+		$data = file_get_contents("http://wordpress.loc/3.4.2/test/gdrive_data.php");
+		$res = json_decode($data);
+		foreach($res->items as $file)
+			if((string) @$file->mimeType == "application/vnd.google-apps.folder")
+				$folders[] = $file;
+			else
+				$files[] = $file;
+		
+		//return result
+		return array(
+			'folders' => $folders,
+			'files' => $files
+		);
+		/**
+		 *end debug 
+		 */
+		
 		//if not logged in
 		if(!$this->check_state()) return "";
 		
@@ -225,8 +253,6 @@ class ModalGdrive extends Controller{
 		
 		//error report
 		if(@$res->error) return new \WP_Error( 0, $res->error );
-		
-		print serialize($res);
 		
 		/**
 		 * Build hierarchical list of files/folders
@@ -283,6 +309,11 @@ class ModalGdrive extends Controller{
 		$hide = "style=\"display:none\"";
 		$show = "";
 		
+		/**
+		 * debug 
+		 */
+		return $show;
+		
 		//for logged in div
 		if($logged_in)
 			if($this->check_state())	//logged in
@@ -304,11 +335,11 @@ class ModalGdrive extends Controller{
 	private function list_files(){
 		
 		//if not logged in
-		if(!$this->check_state()) return "";
+		//if(!$this->check_state()) return "";
 		
-		$files = $this->get_files('root');
+		$files = $this->get_files('root');		
 		$ret = "<ul>\n";
-		ar_print($files);
+		//ar_print($files);
 		
 		//error report
 		if(is_wp_error($files))
@@ -316,9 +347,14 @@ class ModalGdrive extends Controller{
 		
 		//build list and return
 		foreach($files['folders'] as $folder)
-			$ret .= "<li>{$folder->title}</li>\n";
+			$ret .= "<li rel=\"folder\">
+				<a href=\"javascript:void(0)\">{$folder->title}</a>
+				<ul></ul>
+				</li>\n";
 		foreach($files['files'] as $file)
-			$ret .= "<li>{$file->title}</li>\n";
+			$ret .= "<li rel=\"file\">
+				<a href=\"javascript:void(0)\">{$file->title}</a>
+				</li>\n";
 		
 		return "{$ret}</ul>\n";
 		

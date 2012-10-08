@@ -257,6 +257,11 @@ class Controller{
 	 */
 	public function load_styles() {
 		
+		//include dependencies
+		foreach($this->style_deps as $dep)
+			wp_enqueue_style ( $dep );
+		
+		//look for class specific style
 		if(!file_exists("{$this->config->plugin_dir}/public_html/css/{$this->class_name}.css")) return;
 		wp_register_style($this->class_name, "{$this->config->plugin_url}/public_html/css/{$this->class_name}.css", $this->style_deps);
 		wp_enqueue_style( $this->class_name );
