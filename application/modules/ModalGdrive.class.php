@@ -311,8 +311,10 @@ class ModalGdrive extends Controller{
 		
 		/**
 		 * debug 
-		 */
+		 *
 		return $show;
+		 * 
+		 */
 		
 		//for logged in div
 		if($logged_in)
