@@ -239,7 +239,7 @@ class ModalGdrive extends Controller{
 		$ch = curl_init();
 		$folders = array();
 		$files = array();
-		$url = url_query_append("https://www.googleapis.com/drive/v2/files/{$parent}/children", array(
+		$url = url_query_append("https://www.googleapis.com/drive/v2/files/{$parent}/files", array(
 			'access_token' => $this->access_token,
 			'fields' => "etag,title,kind,nextLink,nextPageToken,selfLink"/*,
 			'fields' => "etag,items(alternateLink,createdDate,description,downloadUrl,editable,embedLink,etag,explicitlyTrashed,exportLinks,fileExtension,fileSize,id,imageMediaMetadata,kind,lastModifyingUserName,lastViewedByMeDate,md5Checksum,mimeType,modifiedByMeDate,modifiedDate,originalFilename,quotaBytesUsed,selfLink,sharedWithMeDate,thumbnailLink,title,userPermission,webContentLink,writersCanShare),kind,nextLink,nextPageToken,selfLink",
