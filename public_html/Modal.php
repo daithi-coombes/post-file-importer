@@ -4,7 +4,7 @@
 		<!--[--list services--]-->
 	</div>
 	
-	<div id="sevice-container">
+	<div id="service-container">
 		<iframe id="service-pane"></iframe>
 	</div>
 	

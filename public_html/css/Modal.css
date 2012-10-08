@@ -6,7 +6,13 @@
 	border: 1px solid;
 	width: 180px;
 }
-#service-pane{
+#service-container{
+	float: left;
 	border: 1px solid;
-	margin-left: 200px;
+	width: 400px;
+	height: 90%;
+}
+#service-pane{
+	width: 100%;
+	height: 100%;
 }
