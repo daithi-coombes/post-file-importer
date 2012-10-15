@@ -251,7 +251,7 @@ class ModalGdrive extends Controller{
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
-		ar_print($res);
+		
 		//error report
 		if(@$res->error) return new \WP_Error( $res->error->code, $res->error->message );
 		
@@ -342,7 +342,6 @@ class ModalGdrive extends Controller{
 		
 		$files = $this->get_files();		
 		$ret = "<ul>\n";
-		//ar_print($files);
 		
 		//error report
 		if(is_wp_error($files))
@@ -356,7 +355,9 @@ class ModalGdrive extends Controller{
 				</li>\n";
 		foreach($files['files'] as $file)
 			$ret .= "<li rel=\"file\">
-				<a href=\"javascript:void(0)\">{$file->title}</a>
+				<a href=\"javascript:void(0)\" onclick=\"ci_post_importer_gdrive.get_document_data('{$file->downloadUrl}')\">
+					{$file->title}
+				</a>
 				</li>\n";
 		
 		return "{$ret}</ul>\n";

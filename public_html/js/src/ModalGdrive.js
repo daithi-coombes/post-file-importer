@@ -13,7 +13,7 @@ jQuery(document).ready(function($){
 var CityIndexPostImporterGdrive = function($){
 	
 	/**
-	 * Returns array of url vars
+	 * Returns array of url vars.
 	 *
 	 * @method
 	 * @memberof CityIndexPostImporterGdrive
@@ -56,5 +56,29 @@ var CityIndexPostImporterGdrive = function($){
 			},
 			plugins: [ "themes", "html_data", "json_data", "ui", "types" ]
 		}
-	}
+	};
+	
+	/**
+	 * Gets document data and pos4ts into editor.
+	 * 
+	 * @method
+	 * @memberof CityIndexPostImporterGdrive
+	 * @return void
+	 */
+	function get_document_data(){
+		
+		$.post(
+			ajaxurl,
+			{
+				
+			},
+			this.insert_to_editor(res),
+			'json'
+		);
+	};
+	
+	function insert_to_editor(j){
+		console.log('insert_to_editor response:');
+		console.log(j);
+	};
 };
