@@ -8,7 +8,7 @@ jQuery(document).ready(function($){
 });
 
 /**
- * 
+ * This is the main class.
  */
 var CityIndexPostImporterGdrive = function($){
 	
@@ -16,10 +16,11 @@ var CityIndexPostImporterGdrive = function($){
 	 * Returns array of url vars.
 	 *
 	 * @method
+	 * @public
 	 * @memberof CityIndexPostImporterGdrive
 	 * @link http://papermashup.com/read-url-get-variables-withjavascript/
 	 */
-	function getUrlVars() {
+	this.getUrlVars = function() {
 		var vars = {};
 		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
 			vars[key] = value;
@@ -31,11 +32,12 @@ var CityIndexPostImporterGdrive = function($){
 	 * Returns settings object for jquery.jsTree plugin.
 	 * 
 	 * @method
+	 * @public
 	 * @memberof CityIndexPostImporterGdrive
 	 * @link http://www.jstree.com/documentation/
 	 * @return object
 	 */
-	function jstree_settings(){
+	this.jstree_settings = function(){
 		return {
 			"types": {
 				"valid_children" : ["folder","file"],
@@ -62,21 +64,37 @@ var CityIndexPostImporterGdrive = function($){
 	 * Gets document data and pos4ts into editor.
 	 * 
 	 * @method
+	 * @public
 	 * @memberof CityIndexPostImporterGdrive
+	 * @param {string} url The download url for the file.
+	 * @param {string} ajaxurl The ajaxurl of the blog.
 	 * @return void
 	 */
-	function get_document_data(){
+	this.get_document_data = function(url, ajaxurl){
 		
 		$.post(
 			ajaxurl,
 			{
-				
+				url: ajaxurl,
+				action: 'ci_post_importer_load_service',
+				service: 'Gdrive',
+				downloadUrl: url,
+				_wpnonce: this.getUrlVars()['_wpnonce']
 			},
-			this.insert_to_editor(res),
+			insert_to_editor,
 			'json'
 		);
 	};
 	
+	/**
+	 * Inserts returned document data into editor.
+	 * 
+	 * @method
+	 * @private
+	 * @memberof CityIndexPostImporterGdrive
+	 * @param {json} j The json result.
+	 * @return void
+	 */
 	function insert_to_editor(j){
 		console.log('insert_to_editor response:');
 		console.log(j);

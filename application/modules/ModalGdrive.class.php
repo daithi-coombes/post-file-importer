@@ -214,7 +214,7 @@ class ModalGdrive extends Controller{
 		
 		/**
 		 *debug. 
-		 *
+		 */
 		$data = file_get_contents("http://wordpress.loc/3.4.2/test/gdrive_data.php");
 		$res = json_decode($data);
 		foreach($res->items as $file)
@@ -228,7 +228,7 @@ class ModalGdrive extends Controller{
 			'folders' => $folders,
 			'files' => $files
 		);
-		**
+		/*
 		 *end debug 
 		 */
 		
@@ -338,11 +338,12 @@ class ModalGdrive extends Controller{
 	private function list_files(){
 		
 		//if not logged in
-		if(!$this->check_state()) return "";
+		//if(!$this->check_state()) return "";
 		
 		$files = $this->get_files();		
 		$ret = "<ul>\n";
-		
+		$ajaxurl = get_admin_url(null, 'admin-ajax.php');
+		ar_print($files);
 		//error report
 		if(is_wp_error($files))
 			return "<div class=\"error\">{$files->get_error_message ()}</div>\n";
@@ -354,12 +355,20 @@ class ModalGdrive extends Controller{
 				<ul></ul>
 				</li>\n";
 		foreach($files['files'] as $file)
-			$ret .= "<li rel=\"file\">
-				<a href=\"javascript:void(0)\" onclick=\"ci_post_importer_gdrive.get_document_data('{$file->downloadUrl}')\">
-					{$file->title}
-				</a>
-				</li>\n";
-		
+			//if file is downloadable
+			if($file->downloadUrl)
+				$ret .= "<li rel=\"file\">
+					<a href=\"javascript:void(0)\" onclick=\"ci_post_importer_gdrive.get_document_data('" . urlencode($file->downloadUrl) . "', '{$ajaxurl}')\">
+						{$file->title}
+					</a>
+					</li>\n";
+			//if not downloadable
+			else
+				$ret .= "<li rel=\"file\">
+						{$ajaxurl}
+						{$file->title}
+					</li>\n";
+		print $ret;
 		return "{$ret}</ul>\n";
 		
 	}
