@@ -210,7 +210,7 @@ class ModalGdrive extends Controller{
 	 * @param string $parent
 	 * @return array 
 	 */
-	private function get_files( $parent="root" ){
+	private function get_files( ){
 		
 		/**
 		 *debug. 
@@ -239,12 +239,12 @@ class ModalGdrive extends Controller{
 		$ch = curl_init();
 		$folders = array();
 		$files = array();
-		$url = url_query_append("https://www.googleapis.com/drive/v2/files/{$parent}", array(
-			'access_token' => $this->access_token,
-			'fields' => "etag,items(alternateLink,createdDate,description,downloadUrl,editable,embedLink,etag,explicitlyTrashed,exportLinks,fileExtension,fileSize,id,imageMediaMetadata,kind,lastModifyingUserName,lastViewedByMeDate,md5Checksum,mimeType,modifiedByMeDate,modifiedDate,originalFilename,quotaBytesUsed,selfLink,sharedWithMeDate,thumbnailLink,title,userPermission,webContentLink,writersCanShare),kind,nextLink,nextPageToken,selfLink",
-			'folderId' => $parent
-		));
 		if(!$this->access_token) $this->get_token();
+		$url = url_query_append("https://www.googleapis.com/drive/v2/files/", array(
+			'access_token' => $this->access_token/*,
+			'fields' => "etag,items(alternateLink,createdDate,description,downloadUrl,editable,embedLink,etag,explicitlyTrashed,exportLinks,fileExtension,fileSize,id,imageMediaMetadata,kind,lastModifyingUserName,lastViewedByMeDate,md5Checksum,mimeType,modifiedByMeDate,modifiedDate,originalFilename,quotaBytesUsed,selfLink,sharedWithMeDate,thumbnailLink,title,userPermission,webContentLink,writersCanShare),kind,nextLink,nextPageToken,selfLink",
+			'folderId' => $parent*/
+		));
 		
 		//get file list
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -340,7 +340,7 @@ class ModalGdrive extends Controller{
 		//if not logged in
 		if(!$this->check_state()) return "";
 		
-		$files = $this->get_files('root');		
+		$files = $this->get_files();		
 		$ret = "<ul>\n";
 		//ar_print($files);
 		
