@@ -240,9 +240,9 @@ class ModalGdrive extends Controller{
 		$folders = array();
 		$files = array();
 		$url = url_query_append("https://www.googleapis.com/drive/v2/files/{$parent}", array(
-			'access_token' => $this->access_token/*,
+			'access_token' => $this->access_token,
 			'fields' => "etag,items(alternateLink,createdDate,description,downloadUrl,editable,embedLink,etag,explicitlyTrashed,exportLinks,fileExtension,fileSize,id,imageMediaMetadata,kind,lastModifyingUserName,lastViewedByMeDate,md5Checksum,mimeType,modifiedByMeDate,modifiedDate,originalFilename,quotaBytesUsed,selfLink,sharedWithMeDate,thumbnailLink,title,userPermission,webContentLink,writersCanShare),kind,nextLink,nextPageToken,selfLink",
-			'folderId' => $parent*/
+			'folderId' => $parent
 		));
 		if(!$this->access_token) $this->get_token();
 		
@@ -338,7 +338,7 @@ class ModalGdrive extends Controller{
 	private function list_files(){
 		
 		//if not logged in
-		//if(!$this->check_state()) return "";
+		if(!$this->check_state()) return "";
 		
 		$files = $this->get_files('root');		
 		$ret = "<ul>\n";
