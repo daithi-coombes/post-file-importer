@@ -2,6 +2,9 @@
 namespace CityIndex\WP\PostImporter\Modules;
 use CityIndex\WP\PostImporter\Controller;
 
+//make sure api connection manager is loaded
+require_once (WP_PLUGIN_DIR . "/api-connection-manager/application/modules/class-api-connection-manager.php");
+
 /**
  * Class for handling the modal including tinymce integration.
  * 
@@ -23,6 +26,8 @@ use CityIndex\WP\PostImporter\Controller;
  */
 class Modal extends Controller{
 	
+	/** @var API_Connection_Manager The api connection manager object. */
+	private $api;
 	/** @var array An array of services in {$namespace} => name pairs. */
 	private $services= array();
 	
@@ -31,27 +36,30 @@ class Modal extends Controller{
 	 */
 	function __construct(){
 		
+		//load aip-connection-manager
+		global $API_Connection_Manager;
+		if(!$API_Connection_Manager)
+			$API_Connection_Manager = new \API_Connection_Manager ();
+		$this->api = $API_Connection_Manager;
+		
 		//params
-		$services = array(
-			'Gdrive' => 'GDrive'
-		);
+		$this->services = $this->load_services();
 		$this->script_deps = array('jquery');
 		$this->wp_action = array(
 			'init' => array(&$this, 'editor_tinymce'),
 			'admin_head' => array(&$this, 'admin_head'),
 			'wp_head' => array(&$this, 'admin_head'),
 			'wp_ajax_ci_post_importer_modal' => array(&$this,'get_dialog'),
-			'wp_ajax_ci_post_importer_load_service' => array(&$this, 'load_service')
+			'wp_ajax_ci_post_importer_load_service' => array(&$this, 'get_files')
 		);
 		
 		//calls
 		parent::__construct( __CLASS__ );
-		$this->register_services( $services );
 		
 		//set shortcodes for view file
 		$this->shortcodes = array(
 			'list services' => $this->view_list_services()
-		);		
+		);
 	}
 	
 	/**
@@ -75,6 +83,8 @@ class Modal extends Controller{
 	
 	/**
 	 * Handles all ajax requests to this module.
+	 * 
+	 * @deprecated
 	 */
 	public function ajax(){
 		
@@ -142,7 +152,7 @@ class Modal extends Controller{
 	 * @return void
 	 */
 	public function get_dialog( $html=false ){
-
+		
 		//check nonce
 		if(!$html)	//if an ajax request
 			if(!$this->check_nonce("post importer modal dialog", false));
@@ -166,25 +176,35 @@ class Modal extends Controller{
 	}
 	
 	/**
-	 * Ajax callback. Loads a service.
+	 * Prints files iframe.
 	 * 
-	 * Loads the service class and calls methods defined in 
-	 * $_REQUEST['ci_post_importer_action'].
+	 * Ajax callback. Makes a request to a service for its files and displays
+	 * them.
 	 */
-	public function load_service(){
+	public function get_files(){
 		
 		//security check
 		if(@$_REQUEST['state']) $_REQUEST['_wpnonce'] = $_REQUEST['state'];
 		$this->check_nonce("post importer get service");
 		
-		//load service
-		$class = "\CityIndex\WP\PostImporter\Modules\Modal{$_REQUEST['service']}";
-		$service = new $class();
+		//vars
+		$html = "<ul>\n";
 		
-		//if no actions default to loading view file
-		if(!@$_REQUEST[ $this->config->action_key ])
-			$this->get_dialog( $service->get_page(true) );
-			
+		//connect to service
+		if($this->api->connect( $_REQUEST['service'] ))
+			$files = $this->api->request( $_REQUEST['service'], array(
+				'uri' => 'https://www.googleapis.com/drive/v2/files/',
+				'method' => 'GET'
+			));
+		
+		foreach($files->items as $file){
+			$html .= "<li>
+				{$file->title}
+				</li>";
+		}
+		$html .= "</ul>\n";
+		
+		print $html;
 		die();
 	}
 	
@@ -197,17 +217,20 @@ class Modal extends Controller{
 		
 		$ret = "<ul>\n";
 		
-		foreach($this->services as $class => $name)
-			$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$class}')\">{$name}</a></li>\n";
+		foreach($this->services as $slug => $data)
+			$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$slug}')\">{$data['Name']}</a></li>\n";
 		
 		return "{$ret}\n</ul>\n";
 	}
 	
 	/**
-	 * Registers 3rd party services. See the class description for more
-	 * information.
+	 * Loads the services available from api connection manager.
+	 * 
+	 * Gets the grant urls and lists links to connect to each service.
 	 */
-	private function register_services( array $services ){
-		$this->services = $services;
+	private function load_services( ){
+		
+		$services = $this->api->get_services();
+		return $services;
 	}
 }

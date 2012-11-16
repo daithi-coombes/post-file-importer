@@ -214,7 +214,7 @@ class ModalGdrive extends Controller{
 		
 		/**
 		 *debug. 
-		 */
+		 *
 		$data = file_get_contents("http://wordpress.loc/3.4.2/test/gdrive_data.php");
 		$res = json_decode($data);
 		foreach($res->items as $file)
@@ -228,7 +228,7 @@ class ModalGdrive extends Controller{
 			'folders' => $folders,
 			'files' => $files
 		);
-		/*
+		*
 		 *end debug 
 		 */
 		
@@ -246,11 +246,18 @@ class ModalGdrive extends Controller{
 			'folderId' => $parent*/
 		));
 		
-		//get file list
+		$res = wp_remote_get($url);
+		$data = json_decode($res);
+		ar_print( $data );
+		/**
+		 * get file list
+		 * @deprecated
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$res = json_decode(curl_exec($ch));
+		 * 
+		 */
 		
 		//error report
 		if(@$res->error) return new \WP_Error( $res->error->code, $res->error->message );
@@ -338,12 +345,12 @@ class ModalGdrive extends Controller{
 	private function list_files(){
 		
 		//if not logged in
-		//if(!$this->check_state()) return "";
+		if(!$this->check_state()) return "";
 		
 		$files = $this->get_files();		
 		$ret = "<ul>\n";
 		$ajaxurl = get_admin_url(null, 'admin-ajax.php');
-		ar_print($files);
+		
 		//error report
 		if(is_wp_error($files))
 			return "<div class=\"error\">{$files->get_error_message ()}</div>\n";

@@ -5,7 +5,7 @@ namespace CityIndex\WP\PostImporter;
  * @subpackage ci-wp-post-external
  */
 /*
-Plugin Name: Post Editor
+Plugin Name: Post File Importer
 Plugin URI: http://david-coombes.com
 Description: Adds a modal to the wordpress post/page editor that will allow the user to add content from many sources.
 Version: 0.1
