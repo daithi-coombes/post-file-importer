@@ -3,7 +3,7 @@ namespace CityIndex\WP\PostImporter\Modules;
 use CityIndex\WP\PostImporter\Controller;
 
 //make sure api connection manager is loaded
-require_once (WP_PLUGIN_DIR . "/api-connection-manager/application/modules/class-api-connection-manager.php");
+@require_once (WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
 
 /**
  * Class for handling the modal including tinymce integration.
