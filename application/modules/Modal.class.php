@@ -196,7 +196,7 @@ class Modal extends Controller{
 				'uri' => 'https://www.googleapis.com/drive/v2/files/',
 				'method' => 'GET'
 			));
-		
+		ar_print($files);
 		foreach($files->items as $file){
 			$html .= "<li>
 				{$file->title}
