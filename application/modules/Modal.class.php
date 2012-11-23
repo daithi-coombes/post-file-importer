@@ -206,27 +206,32 @@ class Modal extends Controller{
 				 */
 				case "github/index.php":
 					
-					//get logged in user
-					$user = $this->api->request( $_REQUEST['service'], array(
+					//get github logged in user
+					$res = $this->api->request( $_REQUEST['service'], array(
 						'uri' => "https://api.github.com/user",
-						'method' => 'get'
+						'method' => 'get',
+						'body' => array(
+							'access_token' => true
+						)
 					));
+					$user = json_decode($res['body']);
 					if(@$user->login)
 						$user = $user->login;
-					else return false;
 					
 					//default to showing repos
 					if(!@$_REQUEST['type']){
-						$repos = $this->api->request( $_REQUEST['service'], array(
+						
+						$response = $this->api->request( $_REQUEST['service'], array(
 							'uri' => "https://api.github.com/user/repos",
 							'method' => 'GET',
-							'params' => array(
+							'body' => array(
 								'type' => 'all',
 								'sort' => 'full_name',
-								'direction' => 'asc'
+								'direction' => 'asc',
+								'access_token' => true
 							)
 						));
-
+						$repos = json_decode($response['body']);
 						foreach($repos as $repo){
 							$files[] = array(
 								'title' => $repo->full_name,
@@ -290,10 +295,35 @@ class Modal extends Controller{
 				 * Google files 
 				 */
 				case "google/index.php":
-					$files = $this->api->request( $_REQUEST['service'], array(
+					$res = $this->api->request( $_REQUEST['service'], array(
 						'uri' => 'https://www.googleapis.com/drive/v2/files/',
-						'method' => 'GET'
+						'method' => 'GET',
+						'body' => array(
+							'access_token' => true
+						)
 					));
+					$contents = json_decode($res['body']);
+					
+					foreach($contents->items as $item)
+						if($item->kind=='drive#file'){
+							
+							//work out title
+							if(@$item->originalFilename)
+								$title = $item->originalFilename;
+							else $title = $item->title;
+							
+							//dir or title
+							($item->mimeType=="application/vnd.google-apps.folder") ?
+								$type='dir':
+								$type='file';
+							
+							$files[] = array(
+								'title' => $title,
+								'id' => $item->id,
+								'type' => $type
+							);
+						}
+						
 					break;
 				//end Google files
 				
