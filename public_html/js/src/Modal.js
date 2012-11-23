@@ -1,16 +1,16 @@
-var ci_post_importer;
+var post_importer;
 
 jQuery(document).ready(function($){
 	
-	ci_post_importer = new CityIndexPostImporter($);
-	ci_post_importer.init();
+	post_importer = new PostFileImporter($);
+	_post_importer.init();
 });
 
 /**
- * @class The main javascript class for cityindex post importer
- * @namespace
+ * @class The main class for the post file importer
+ * @namespace PostFileImporter
  */
-var CityIndexPostImporter = function($){
+var PostFileImporter = function($){
 	
 	/**
 	 * Init method call
@@ -27,6 +27,7 @@ var CityIndexPostImporter = function($){
 	 *
 	 * @public
 	 * @memberof CityIndexPostImporter
+	 * @deprecated iframes not allowed for most oauth2 grant requests
 	 */
 	this.connect = function( service ){
 		$('#service-pane').attr('src', ci_post_importer_ajaxurl

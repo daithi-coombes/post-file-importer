@@ -188,18 +188,130 @@ class Modal extends Controller{
 		$this->check_nonce("post importer get service");
 		
 		//vars
+		$files = array();
 		$html = "<ul>\n";
+		$uri_current = 'http';
+		if(@$_SERVER["HTTPS"] == "on")
+			$uri_current .= "s";
+		$uri_current .= "://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 		
-		//connect to service
+		/**
+		 * This is where the plugin interacts with the API Connection Manager. 
+		 */
 		if($this->api->connect( $_REQUEST['service'] ))
-			$files = $this->api->request( $_REQUEST['service'], array(
-				'uri' => 'https://www.googleapis.com/drive/v2/files/',
-				'method' => 'GET'
-			));
-		ar_print($files);
-		foreach($files->items as $file){
+			switch ($_REQUEST['service']) {
+			
+				/**
+				 * GitHub files 
+				 */
+				case "github/index.php":
+					
+					//get logged in user
+					$user = $this->api->request( $_REQUEST['service'], array(
+						'uri' => "https://api.github.com/user",
+						'method' => 'get'
+					));
+					if(@$user->login)
+						$user = $user->login;
+					else return false;
+					
+					//default to showing repos
+					if(!@$_REQUEST['type']){
+						$repos = $this->api->request( $_REQUEST['service'], array(
+							'uri' => "https://api.github.com/user/repos",
+							'method' => 'GET',
+							'params' => array(
+								'type' => 'all',
+								'sort' => 'full_name',
+								'direction' => 'asc'
+							)
+						));
+
+						foreach($repos as $repo){
+							$files[] = array(
+								'title' => $repo->full_name,
+								'id' => $repo->full_name,
+								'type' => 'repo'
+							);
+						}
+					}
+					
+					//list contents
+					else{
+						(@$_REQUEST['path']) ?
+							$path = $_REQUEST['path']:
+							$path = "";
+						
+						//if getting contents
+						$uri ="https://api.github.com/repos/{$_REQUEST['id']}/contents/{$path}";
+						$contents = $this->api->request( $_REQUEST['service'], array(
+							'method' => 'get',
+							'uri' => $uri
+						));
+
+						if(@$_REQUEST['type']=='file'){
+							
+							//get data
+							$file = $contents;
+							if('base64'==$file->encoding) $data = base64_decode ($file->content);
+							
+							//post to editor and die
+							?>
+							<textarea id="data" style="display:none"><?php echo $data; ?></textarea>
+							<script type="text/javascript">
+								var data = document.getElementById('data').value;
+								console.log(data);
+								window.parent.parent.tinyMCE.execCommand('mceInsertContent', false, data);
+								window.parent.parent.tb_remove();
+							</script>
+							<?php
+							die();
+						}
+								
+							
+						else
+							foreach($contents as $item){
+								$files[] = array(
+									'title' => $item->name,
+									'id' => $_REQUEST['id'],
+									'type' => $item->type,
+									'path' => $item->path
+								);
+							}
+							
+						//if downloading
+					}
+					//build up files array from github response
+						
+					break;
+				//end GitHub files
+				
+				/**
+				 * Google files 
+				 */
+				case "google/index.php":
+					$files = $this->api->request( $_REQUEST['service'], array(
+						'uri' => 'https://www.googleapis.com/drive/v2/files/',
+						'method' => 'GET'
+					));
+					break;
+				//end Google files
+				
+				/**
+				 * Default: Error report 
+				 */
+				default:
+					die("Unkown service {$_REQUEST['service']} Please add call for files to Modal::get_files()");
+					break;
+				//end Error report
+			}
+		/**
+		 * end API Connection Manager 
+		 */
+		foreach($files as $file){
+			$uri = url_query_append($uri_current, $file);
 			$html .= "<li>
-				{$file->title}
+				<a href=\"$uri\">{$file['title']}</a>
 				</li>";
 		}
 		$html .= "</ul>\n";
