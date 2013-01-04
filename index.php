@@ -3,6 +3,7 @@ namespace CityIndex\WP\PostImporter;
 /**
  * @package cityindex
  * @subpackage ci-wp-post-external
+ * 
  */
 /*
 Plugin Name: Post File Importer

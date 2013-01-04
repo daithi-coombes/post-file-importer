@@ -70,7 +70,8 @@ class Config{
 		register_activation_hook( "{$this->plugin_dir}/index.php", array(&$this, 'activate'));
 		
 		//register 3rd parties
-		$this->register_3rd_parties();
+		add_action('init', array(&$this, 'register_3rd_parties'));
+		//$this->register_3rd_parties();
 		
 		//set options
 		$this->get_options();
@@ -182,7 +183,7 @@ class Config{
 	 * 
 	 * @return void
 	 */
-	private function register_3rd_parties(){
+	public function register_3rd_parties(){
 		
 		if(!count($this->third_party)) return;
 		

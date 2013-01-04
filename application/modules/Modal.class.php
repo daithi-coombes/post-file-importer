@@ -157,7 +157,13 @@ class Modal extends Controller{
 		if(!$html)	//if an ajax request
 			if(!$this->check_nonce("post importer modal dialog", false));
 		
+		//enqueue styles
+		wp_register_style('post-file-importer', "{$this->config->plugin_url}/public_html/css/Modal.css");
+		wp_enqueue_style('post-file-importer');
+		
 		//iframe head
+		$this->load_scripts();
+		$this->load_styles();
 		?><html><head><?php
 		wp_enqueue_style('media');
 		wp_enqueue_style('colors');
@@ -185,11 +191,11 @@ class Modal extends Controller{
 		
 		//security check
 		if(@$_REQUEST['state']) $_REQUEST['_wpnonce'] = $_REQUEST['state'];
-		$this->check_nonce("post importer get service");
+		//$this->check_nonce("post importer get service");
 		
 		//vars
 		$files = array();
-		$html = "<ul>\n";
+		$service = $this->api->get_service($_REQUEST['service']);
 		$uri_current = 'http';
 		if(@$_SERVER["HTTPS"] == "on")
 			$uri_current .= "s";
@@ -198,155 +204,153 @@ class Modal extends Controller{
 		/**
 		 * This is where the plugin interacts with the API Connection Manager. 
 		 */
-		if($this->api->connect( $_REQUEST['service'] ))
-			switch ($_REQUEST['service']) {
+		//if($this->api->connect( $_REQUEST['service'] ))
 			
-				/**
-				 * GitHub files 
-				 */
-				case "github/index.php":
-					
-					//get github logged in user
-					$res = $this->api->request( $_REQUEST['service'], array(
-						'uri' => "https://api.github.com/user",
-						'method' => 'get',
-						'body' => array(
-							'access_token' => true
-						)
-					));
-					$user = json_decode($res['body']);
-					if(@$user->login)
-						$user = $user->login;
-					
-					//default to showing repos
-					if(!@$_REQUEST['type']){
-						
-						$response = $this->api->request( $_REQUEST['service'], array(
-							'uri' => "https://api.github.com/user/repos",
-							'method' => 'GET',
-							'body' => array(
-								'type' => 'all',
-								'sort' => 'full_name',
-								'direction' => 'asc',
-								'access_token' => true
-							)
-						));
-						$repos = json_decode($response['body']);
-						foreach($repos as $repo){
-							$files[] = array(
-								'title' => $repo->full_name,
-								'id' => $repo->full_name,
-								'type' => 'repo'
-							);
-						}
-					}
-					
-					//list contents
-					else{
-						(@$_REQUEST['path']) ?
-							$path = $_REQUEST['path']:
-							$path = "";
-						
-						//if getting contents
-						$uri ="https://api.github.com/repos/{$_REQUEST['id']}/contents/{$path}";
-						$contents = $this->api->request( $_REQUEST['service'], array(
-							'method' => 'get',
-							'uri' => $uri
-						));
-
-						if(@$_REQUEST['type']=='file'){
-							
-							//get data
-							$file = $contents;
-							if('base64'==$file->encoding) $data = base64_decode ($file->content);
-							
-							//post to editor and die
-							?>
-							<textarea id="data" style="display:none"><?php echo $data; ?></textarea>
-							<script type="text/javascript">
-								var data = document.getElementById('data').value;
-								console.log(data);
-								window.parent.parent.tinyMCE.execCommand('mceInsertContent', false, data);
-								window.parent.parent.tb_remove();
-							</script>
-							<?php
-							die();
-						}
-								
-							
-						else
-							foreach($contents as $item){
-								$files[] = array(
-									'title' => $item->name,
-									'id' => $_REQUEST['id'],
-									'type' => $item->type,
-									'path' => $item->path
-								);
-							}
-							
-						//if downloading
-					}
-					//build up files array from github response
-						
-					break;
-				//end GitHub files
-				
-				/**
-				 * Google files 
-				 */
-				case "google/index.php":
-					$res = $this->api->request( $_REQUEST['service'], array(
-						'uri' => 'https://www.googleapis.com/drive/v2/files/',
-						'method' => 'GET',
-						'body' => array(
-							'access_token' => true
-						)
-					));
-					$contents = json_decode($res['body']);
-					
-					foreach($contents->items as $item)
-						if($item->kind=='drive#file'){
-							
-							//work out title
-							if(@$item->originalFilename)
-								$title = $item->originalFilename;
-							else $title = $item->title;
-							
-							//dir or title
-							($item->mimeType=="application/vnd.google-apps.folder") ?
-								$type='dir':
-								$type='file';
-							
-							$files[] = array(
-								'title' => $title,
-								'id' => $item->id,
-								'type' => $type
-							);
-						}
-						
-					break;
-				//end Google files
-				
-				/**
-				 * Default: Error report 
-				 */
-				default:
-					die("Unkown service {$_REQUEST['service']} Please add call for files to Modal::get_files()");
-					break;
-				//end Error report
-			}
 		/**
-		 * end API Connection Manager 
-		 */
-		foreach($files as $file){
-			$uri = url_query_append($uri_current, $file);
-			$html .= "<li>
-				<a href=\"$uri\">{$file['title']}</a>
-				</li>";
+			* Switch through services and request contents.
+			* 
+			* Each service builds up array in format:
+			*		$content->dir[type,id,title]
+			*		$content->files[type,id,title]
+			* When a service gets file contents the result must be stored in
+			* $data.
+			*  
+			*/
+		$contents = (object) array(
+			'dirs' => array(),
+			'files' => array()
+		);
+		$data = false;
+		switch ($_REQUEST['service']) {
+
+			/**
+				* Facebook photos 
+				*/
+			case "facebook/index.php":
+
+				require_once('Facebook.class.php');
+				$facebook = new Facebook();
+				$facebook->plugin_url = $this->config->plugin_url;
+
+				switch(@$_GET['fb_action']){
+
+					//parse facebook img data
+					case 'parse_img':
+						$facebook->parse_img($_GET['id']);
+						break;
+
+					//get album contents
+					case 'get_album':
+						$html = $facebook->get_album();
+						break;
+
+					//get photo
+					case 'get_photo':
+						$data = $facebook->get_photo($_GET['id']);
+						break;
+					
+					//list albums
+					default:
+						$html = $facebook->get_contents();
+						break;
+				}
+				break;
+			//end Facebook files
+
+			/**
+				* GitHub files 
+				*/
+			case "github/index.php":
+
+				require_once('Github.class.php');
+				$github = new Github();
+				$github->plugin_url = $this->config->plugin_url;
+				$contents = $github->get_content();
+
+				if(@$_GET['type']=='file')
+					$data = $contents;
+				else
+					$html  = $github->get_html($contents);
+
+				break;
+			//end GitHub files
+
+			/**
+				* Google files 
+				*/
+			case "google/index.php":
+
+				//construct class
+				require_once('Gdrive.class.php');
+				$gdrive = new Gdrive();
+				$gdrive->plugin_url = $this->config->plugin_url;
+
+				//getting file
+				if(@$_GET['type']=='file')
+					$data = $gdrive->get_file($_GET['id']);
+
+				//getting contents
+				else{
+					$contents = $gdrive->get_files();
+					$html = $gdrive->get_tree($contents);
+				}
+
+				break;
+			//end Google files
+
+			/**
+				* Default: Error report 
+				*/
+			default:
+				die("Unkown service {$_REQUEST['service']} Please add call for files to Modal::get_files()");
+				break;
+			//end Error report
 		}
-		$html .= "</ul>\n";
+
+		/**
+		 * post to editor
+		 * 
+		 * Place data in textarea, add textarea content to editor and close
+		 * thickbox modal window, die().
+		 */
+		if($data){
+			/**
+			 * escape html tags
+			 *
+			$data = htmlentities($data);
+			$data = str_replace("&", "&#38;", $data);
+			$data = str_replace("\n", "<br/>", $data);
+			 * 
+			 */
+			?>
+			<textarea id="data" cols="120" rows="80"><?php echo $data; ?></textarea>
+			<script type="text/javascript">
+				var data = document.getElementById('data').value;
+				window.parent.parent.tinyMCE.execCommand('mceInsertContent', false, data);
+				window.parent.parent.tb_remove();
+			</script>
+			<?php
+			die();
+		}// end post to editor		
 		
-		print $html;
+		/**
+		 * Navigation 
+		 */
+		$nav = "
+			<div id=\"navigation\">
+				<span class=\"nav-forw\">
+					<a href=\"javascript:history.back()\">&lt;</a>
+				</span>
+				<span class=\"nav-back\">
+					<a href=\"javascript:history.forward()\">></a>
+				</span>
+			</div>\n";
+		//end Navigation
+		
+		//build html
+		$this->get_dialog($nav.$html); //print $html;
+		
+		//die();
 		die();
 	}
 	
