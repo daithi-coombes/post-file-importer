@@ -364,7 +364,10 @@ class Modal extends Controller{
 		$ret = "<ul>\n";
 		
 		foreach($this->services as $slug => $data)
-			$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$slug}')\">{$data['Name']}</a></li>\n";
+			if(!is_object($data)) $name = $data['Name'];
+			else $name = $data->Name;
+			
+		$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$slug}')\">{$name}</a></li>\n";
 		
 		return "{$ret}\n</ul>\n";
 	}
