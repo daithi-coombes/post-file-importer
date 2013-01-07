@@ -276,8 +276,8 @@ class Modal extends Controller{
 			//end GitHub files
 
 			/**
-				* Google files 
-				*/
+			 * Google files 
+			 */
 			case "google/index.php":
 
 				//construct class
@@ -298,6 +298,20 @@ class Modal extends Controller{
 				break;
 			//end Google files
 
+			/**
+			 * Twitter data 
+			 */
+			case 'twitter/index.php':
+				
+				//construct class
+				require_once('Twitter.class.php');
+				$twitter = new Twitter();
+				
+				//get tweets
+				$tweets = $twitter->get_tweets();
+				
+				break;
+				
 			/**
 				* Default: Error report 
 				*/
@@ -356,18 +370,18 @@ class Modal extends Controller{
 	
 	/**
 	 * Shortcode callback. Returns html list of services for the view file.
-	 *
+	 * @todo clean after modules objectivied
 	 * @return string
 	 */
 	private function view_list_services(){
 		
 		$ret = "<ul>\n";
 		
-		foreach($this->services as $slug => $data)
+		foreach($this->services as $slug => $data){
 			if(!is_object($data)) $name = $data['Name'];
 			else $name = $data->Name;
-			
-		$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$slug}')\">{$name}</a></li>\n";
+			$ret .= "<li><a href=\"javascript:void(0)\" onclick=\"ci_post_importer.connect('{$slug}')\">{$name}</a></li>\n";
+		}
 		
 		return "{$ret}\n</ul>\n";
 	}
