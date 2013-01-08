@@ -306,6 +306,7 @@ class Modal extends Controller{
 				//construct class
 				require_once('Twitter.class.php');
 				$twitter = new Twitter();
+				$html = "";
 				
 				//get tweets
 				$tweets = $twitter->get_tweets();

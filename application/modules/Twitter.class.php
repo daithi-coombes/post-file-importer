@@ -8,14 +8,22 @@ namespace CityIndex\WP\PostImporter\Modules;
  */
 class Twitter {
 	
+	
+	
 	public function get_tweets(){
 		
 		global $API_Connection_Manager;
 		$service = $API_Connection_Manager->get_service('twitter/index.php');
 		
-		return $service->request(
-			'http://api.twitter.com/1/statuses/user_timeline.format'
+		$tweets = $service->request(
+			'http://api.twitter.com/1/statuses/user_timeline.format',
+			'GET',
+			array(
+				'user_id' => $service->user_id
+			)
 		);
+		
+		ar_print($tweets);
 	}
 }
 
