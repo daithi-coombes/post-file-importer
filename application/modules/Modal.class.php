@@ -311,6 +311,8 @@ class Modal extends Controller{
 				//get tweets
 				$tweets = $twitter->get_tweets();
 				
+				$html = $twitter->parse_tweets( $tweets );
+				
 				break;
 				
 			/**
