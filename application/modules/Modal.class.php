@@ -230,6 +230,8 @@ class Modal extends Controller{
 				
 				$files = $dropbox->get_files();
 				
+				$html = $dropbox->build_html( $files );
+				
 				break;
 			
 			/**
