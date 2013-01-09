@@ -223,6 +223,15 @@ class Modal extends Controller{
 		$data = false;
 		switch ($_REQUEST['service']) {
 
+			case "dropbox/index.php":
+				
+				require_once('Dropbox.class.php');
+				$dropbox = new Dropbox();
+				
+				$files = $dropbox->get_files();
+				
+				break;
+			
 			/**
 				* Facebook photos 
 				*/
