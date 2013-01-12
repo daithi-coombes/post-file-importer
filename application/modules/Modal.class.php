@@ -310,6 +310,19 @@ class Modal extends Controller{
 			//end Google files
 
 			/**
+			 * Mailchimp data 
+			 */
+			case 'mailchimp/index.php':
+				
+				require_once('MailChimp.class.php');
+				$mailchimp = new MailChimp();
+				
+				$data = $mailchimp->get_data();
+				
+				break;
+			//end Mailchimp data
+				
+			/**
 			 * Twitter data 
 			 */
 			case 'twitter/index.php':
