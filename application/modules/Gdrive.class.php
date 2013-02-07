@@ -18,6 +18,7 @@ class Gdrive {
 	function __construct() {
 		$this->api = new \API_Connection_Manager();
 		$this->modal = $this->api->get_service("google/index.php");
+		$this->modal->log($this->modal);
 	}
 	
 	public function get_file($id){
