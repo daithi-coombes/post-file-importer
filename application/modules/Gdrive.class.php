@@ -13,9 +13,11 @@ class Gdrive {
 
 	public $plugin_url;
 	private $api;
+	private $modal;
 
 	function __construct() {
 		$this->api = new \API_Connection_Manager();
+		$this->modal = $this->api->get_service("google/index.php");
 	}
 	
 	public function get_file($id){
@@ -47,12 +49,10 @@ class Gdrive {
 	public function get_files() {
 
 		if (@$_GET['type'] != 'file')
-			$res = $this->api->request($_REQUEST['service'], array(
-				'uri' => 'https://www.googleapis.com/drive/v2/files/',
-				'method' => 'GET',
-				'body' => array(
-					'access_token' => true
-					)));
+			$res = $this->modal->request(
+				'https://www.googleapis.com/drive/v2/files/',
+				'GET'
+			);
 
 		$contents = json_decode($res['body']);
 		$gdrive_dirs = array();

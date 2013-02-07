@@ -195,7 +195,6 @@ class Modal extends Controller{
 		
 		//vars
 		$files = array();
-		$service = $this->api->get_service($_REQUEST['service']);
 		$uri_current = 'http';
 		if(@$_SERVER["HTTPS"] == "on")
 			$uri_current .= "s";
