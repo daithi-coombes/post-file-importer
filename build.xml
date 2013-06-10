@@ -121,7 +121,7 @@
  </target>
 
  <target name="phpdox" description="Generate API documentation using phpDox">
-  <exec executable="phpdox"/>
+  <exec executable="/opt/phpdox-0.5.phar"/>
  </target>
 
  <target name="phpunit" description="Run unit tests with PHPUnit">
