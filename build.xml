@@ -4,7 +4,7 @@
  <!-- <target name="build"
    depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdox,phpunit,phpcb"/> -->
  <target name="build"
-   depends="prepare,lint,phploc,pdepend,phpmd,phpmd-ci,phpcs-ci,phpcpd,phpunit"/>
+   depends="prepare,lint,phploc,pdepend,phpmd,phpmd-ci,phpcs-ci,phpcpd,phpdox,phpunit,phpcb"/>
 
  <target name="build-parallel"
    depends="prepare,lint,tools-parallel,phpunit"/>
@@ -19,9 +19,7 @@
    <antcall target="phpcpd"/>
    <antcall target="phpcs-ci"/>
    <antcall target="phploc"/>
-   <!--
    <antcall target="phpdox"/>
--->
   </parallel>
  </target>
 
@@ -122,11 +120,9 @@
   </exec>
  </target>
 
- <!--
  <target name="phpdox" description="Generate API documentation using phpDox">
   <exec executable="phpdox"/>
  </target>
--->
 
  <target name="phpunit" description="Run unit tests with PHPUnit">
   <exec executable="phpunit" failonerror="true">
@@ -138,7 +134,6 @@
   </exec>
  </target>
 
-<!--
  <target name="phpcb" description="Aggregate tool output with PHP_CodeBrowser">
   <exec executable="phpcb">
    <arg value="log" />
@@ -149,5 +144,4 @@
    <arg path="${basedir}/build/code-browser" />
   </exec>
  </target>
--->
 </project>
