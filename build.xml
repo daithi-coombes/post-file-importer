@@ -44,7 +44,7 @@
   <apply executable="php" failonerror="true">
    <arg value="-l" />
 
-   <fileset dir="${basedir}/applicaton/modules">
+   <fileset dir="${basedir}/application/modules">
     <include name="*.class.php" />
     <modified />
    </fileset>
