@@ -1,6 +1,6 @@
 <?php
 
-class ModalTest extends PHPUnit_Framework_TestCase{
+class ModalTest extends WP_UnitTestCase{
 
 	function test_foo(){
 		$foo = true;
