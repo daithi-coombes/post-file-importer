@@ -85,7 +85,7 @@ class Modal extends Controller{
 	 * Handles all ajax requests to this module.
 	 * 
 	 * @deprecated
-	 */
+	 *
 	public function ajax(){
 		
 		$service = @$_GET['service'];
@@ -101,6 +101,7 @@ class Modal extends Controller{
 				break;
 		}
 	}
+	*/
 	
 	/**
 	 * Adds buttons to the wp editors tinymce buttons array.
