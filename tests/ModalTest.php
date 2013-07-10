@@ -1,6 +1,11 @@
 <?php
 
-class ModalTest extends PHPUnit_Framework_TestCase{
+class ModalTest extends WP_UnitTestCase{
+
+	protected $obj;
+
+	function setUp(){
+	}
 
 	function test_foo(){
 		$foo = true;
