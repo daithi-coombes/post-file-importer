@@ -221,6 +221,20 @@ class Modal extends Controller{
 			'files' => array()
 		);
 		$data = false;
+
+		//get files
+		$slug = ucfirst(dirname( $_REQUEST['service'] ));
+		require_once("{$slug}.class.php");
+		$class = "\CityIndex\WP\PostImporter\Modules\\$slug";
+		$importer = new $class();
+
+		$files = $importer->get_files();
+		var_dump($files);
+		die();
+
+		/**
+		 * @deprecated Replaced with one method calls $service->get_files(), $service->build_html()
+		 *
 		switch ($_REQUEST['service']) {
 
 			case "dropbox/index.php":
@@ -236,7 +250,7 @@ class Modal extends Controller{
 			
 			/**
 				* Facebook photos 
-				*/
+				*
 			case "facebook/index.php":
 
 				require_once('Facebook.class.php');
@@ -270,7 +284,7 @@ class Modal extends Controller{
 
 			/**
 				* GitHub files 
-				*/
+				*
 			case "github/index.php":
 
 				require_once('Github.class.php');
@@ -288,7 +302,7 @@ class Modal extends Controller{
 
 			/**
 			 * Google files 
-			 */
+			 *
 			case "google/index.php":
 
 				//construct class
@@ -311,7 +325,7 @@ class Modal extends Controller{
 
 			/**
 			 * Mailchimp data 
-			 */
+			 *
 			case 'mailchimp/index.php':
 				
 				require_once('MailChimp.class.php');
@@ -324,7 +338,7 @@ class Modal extends Controller{
 				
 			/**
 			 * Twitter data 
-			 */
+			 *
 			case 'twitter/index.php':
 				
 				//construct class
@@ -341,12 +355,13 @@ class Modal extends Controller{
 				
 			/**
 				* Default: Error report 
-				*/
+				*
 			default:
 				die("Unkown service {$_REQUEST['service']} Please add call for files to Modal::get_files()");
 				break;
 			//end Error report
 		}
+		*/
 
 		/**
 		 * post to editor

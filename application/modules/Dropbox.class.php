@@ -26,10 +26,20 @@ class Dropbox {
 		$module = $API_Connection_Manager->get_service('dropbox/index.php');
 		
 		$response = $module->request(
-				"https://api.dropbox.com/1/metadata{$path}",
-				"get"
-				);
-		
+			"https://api.dropbox.com/1/metadata{$path}",
+			"get",
+			null,
+			false
+		);
+
+		//check for 401
+		if( (int) $response['response']['code']==401){
+			$url = $module->get_login_button();
+		die($url);
+			wp_redirect($url);
+			die();
+		}
+
 		return json_decode($response['body']);
 	}
 	
