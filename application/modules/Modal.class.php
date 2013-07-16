@@ -4,6 +4,7 @@ use CityIndex\WP\PostImporter\Controller;
 
 //make sure api connection manager is loaded
 @require_once (WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
+require_once( WP_PLUGIN_DIR . '/post-file-importer/application/Controller.class.php' );
 
 /**
  * Class for handling the modal including tinymce integration.
@@ -81,6 +82,18 @@ class Modal extends Controller{
 		<?php
 	}
 	
+	/**
+	 * Callback. Connects user
+	 * @param  stdClass $dto The dto object returned from API_Connection_Manager::do_callback()
+	 */
+	public function connect_user( $dto ){
+
+		global $API_Connection_Manager;
+		$module = $API_Connection_Manager->get_service( $dto->slug );
+		$uid = $module->get_uid();
+		$login = $module->login( $uid );	//$module::login will set error in global if found
+	}
+
 	/**
 	 * Handles all ajax requests to this module.
 	 * 
@@ -195,12 +208,34 @@ class Modal extends Controller{
 		//$this->check_nonce("post importer get service");
 		
 		//vars
+		global $API_Connection_Manager;
 		$files = array();
+		$module = $API_Connection_Manager->get_service( @$_REQUEST['service'] );
 		$uri_current = 'http';
 		if(@$_SERVER["HTTPS"] == "on")
 			$uri_current .= "s";
 		$uri_current .= "://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 		
+		//check if connected
+		$connections = $module->get_connections();
+		if( !array_key_exists( $module->slug, $connections) ){
+			$html = '<p>You are not connected to ' . $module->Name . '</p>
+				<p><a href="' . $module->get_login_button( __FILE__, array( &$this, 'connect_user', false, ) ) . '" target="_new">
+					Connect your wordpress account with ' . $module->Name . '</a>';
+			die( $html );
+		}
+
+
+		//get files
+		$slug = ucfirst(dirname( $_REQUEST['service'] ));
+		require_once("{$slug}.class.php");
+		$class = "\CityIndex\WP\PostImporter\Modules\\$slug";
+		$importer = new $class();
+
+		$files = $importer->get_files();
+		var_dump($files);
+		die();
+
 		/**
 		 * This is where the plugin interacts with the API Connection Manager. 
 		 */
@@ -216,21 +251,12 @@ class Modal extends Controller{
 			* $data.
 			*  
 			*/
+		
 		$contents = (object) array(
 			'dirs' => array(),
 			'files' => array()
 		);
 		$data = false;
-
-		//get files
-		$slug = ucfirst(dirname( $_REQUEST['service'] ));
-		require_once("{$slug}.class.php");
-		$class = "\CityIndex\WP\PostImporter\Modules\\$slug";
-		$importer = new $class();
-
-		$files = $importer->get_files();
-		var_dump($files);
-		die();
 
 		/**
 		 * @deprecated Replaced with one method calls $service->get_files(), $service->build_html()

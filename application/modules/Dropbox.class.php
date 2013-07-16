@@ -23,24 +23,32 @@ class Dropbox {
 	public function get_files( $path="/dropbox" ){
 		
 		global $API_Connection_Manager;
+		$files = array();
 		$module = $API_Connection_Manager->get_service('dropbox/index.php');
 		
 		$response = $module->request(
 			"https://api.dropbox.com/1/metadata{$path}",
 			"get",
 			null,
-			false
+			true
 		);
 
-		//check for 401
-		if( (int) $response['response']['code']==401){
+		//check for 401, redirect to login url
+		if( (int) $response['response']['code']==401 ){
+			var_dump(basename(__FILE__));
+			die();
 			$url = $module->get_login_button();
-		die($url);
-			wp_redirect($url);
+			print "<a href=\"{$url}\" target=\"_new\">Login to DropBox</a>";
 			die();
 		}
 
-		return json_decode($response['body']);
+		foreach(json_decode($response['body'])->contents as $file){
+			$files[] = array(
+				'name' => $file->path
+			);
+		}
+
+		return $files;
 	}
 	
 }
