@@ -8,7 +8,7 @@ namespace CityIndex\WP\PostImporter\Modules;
  */
 class MailChimp {
 	
-	function get_data(){
+	function get_files(){
 		
 		global $API_Connection_Manager;
 		$module = $API_Connection_Manager->get_service('mailchimp/index.php');
@@ -21,8 +21,8 @@ class MailChimp {
 				"post"
 				);
 		
-		ar_print($res);
+		$data = json_decode($res['body']);
+		var_dump($data);
+		die();
 	}
 }
-
-?>

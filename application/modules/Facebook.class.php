@@ -18,6 +18,10 @@ class Facebook {
 		$this->api = new \API_Connection_Manager();
 	}
 	
+	public function get_files(){
+		
+	}
+
 	public function get_album(){
 		
 		$res = $this->api->request($_REQUEST['service'],array(
